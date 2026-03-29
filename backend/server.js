@@ -52,6 +52,7 @@ app.use('/api/fee-structures', require('./routes/feeStructureRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/staff', require('./routes/staffRoutes'));
 app.use('/api/hq', require('./routes/hqRoutes'));
+app.use('/api/student-portal', require('./routes/studentPortalRoutes'));
 
 // ─── Serve Frontend (static files) ───
 app.use(express.static(path.join(__dirname, '../frontend')));
