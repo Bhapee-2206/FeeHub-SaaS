@@ -8,245 +8,193 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         (function() {
-            var token = localStorage.getItem('feehub_token');
-            if (!token) { window.location.replace('hq-login.html'); return; }
-            try {
-                var payload = JSON.parse(atob(token.split('.')[1]));
-                if (payload.exp * 1000 < Date.now() || payload.role !== 'SuperAdmin') {
-                    window.location.replace('hq-login.html'); return;
-                }
-            } catch(e) { window.location.replace('hq-login.html'); return; }
+            var t = localStorage.getItem('feehub_token');
+            if (!t) { window.location.replace('hq-login.html'); return; }
+            try { var p = JSON.parse(atob(t.split('.')[1]));
+                if (p.exp * 1000 < Date.now() || p.role !== 'SuperAdmin') { window.location.replace('hq-login.html'); }
+            } catch(e) { window.location.replace('hq-login.html'); }
         })();
     </script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
-        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
-        .hq-sidebar {
-            background: #ffffff;
-            border-right: 1px solid #e2e8f0;
-        }
-
-        .hq-card {
-            background: #ffffff;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .hq-card:hover {
-            border-color: #e2e8f0;
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-        }
-
-        .hq-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .hq-input {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #0f172a;
-            transition: all 0.3s ease;
-        }
-        .hq-input::placeholder { color: #94a3b8; }
-        .hq-input:focus {
-            background: #ffffff;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            outline: none;
-        }
-
-        .tr-animate { animation: slideInX 0.4s ease-out forwards; opacity: 0; transform: translateX(-10px); }
-        @keyframes slideInX { to { opacity: 1; transform: translateX(0); } }
-
-        .bg-pattern {
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 24px 24px;
-            opacity: 0.4;
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-        }
-
-        .glass-modal {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
+        .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .card { background: #fff; border: 1px solid #f1f5f9; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: all 0.35s cubic-bezier(.4,0,.2,1); }
+        .card:hover { border-color: #e2e8f0; transform: translateY(-3px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.08); }
+        .input-hq { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 18px; font-size: 14px; font-weight: 600; color: #0f172a; transition: all 0.25s; outline: none; width: 100%; }
+        .input-hq::placeholder { color: #94a3b8; font-weight: 500; }
+        .input-hq:focus { background: #fff; border-color: #818cf8; box-shadow: 0 0 0 4px rgba(99,102,241,0.08); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeUp 0.5s cubic-bezier(.16,1,.3,1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 60ms; } .delay-2 { animation-delay: 120ms; } .delay-3 { animation-delay: 180ms; } .delay-4 { animation-delay: 240ms; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden overflow-x-hidden antialiased selection:bg-indigo-100 selection:text-indigo-900">
+<body class="bg-[#f8fafc] font-sans text-slate-800 antialiased overflow-x-hidden selection:bg-indigo-100 min-h-screen">
 
-    <div class="bg-pattern"></div>
-
-    <!-- Sidebar overlay (mobile) -->
-    <div id="hqSidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-10 hidden lg:hidden" onclick="toggleHqSidebar()"></div>
-
-    <!-- Sidebar -->
-    <aside id="hqSidebar" class="w-72 h-full hq-sidebar z-20 flex flex-col flex-shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)] fixed lg:relative transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-        <div class="h-[80px] flex items-center justify-between px-6 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-                <div class="relative">
-                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-200">FH</div>
-                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
-                </div>
-                <div>
-                    <h1 class="text-slate-900 font-black text-lg tracking-tight leading-none">FeeHub HQ</h1>
-                    <p class="text-indigo-500 text-[10px] font-black uppercase tracking-widest mt-0.5">Master Control</p>
-                </div>
-            </div>
-            <button onclick="toggleHqSidebar()" class="lg:hidden text-slate-400 hover:text-slate-800 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <!-- Mobile Header -->
+    <header class="lg:hidden glass sticky top-0 z-40 border-b border-slate-200/60 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-500/20">FH</div>
+            <span class="font-black text-slate-900 text-lg tracking-tight">FeeHub HQ</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openModal()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-transform shadow-lg">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg> New
+            </button>
+            <button onclick="logout()" class="text-red-500 hover:bg-red-50 p-2 rounded-xl transition-colors" title="Sign Out">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             </button>
         </div>
+    </header>
 
-        <nav class="flex-1 p-6 space-y-2 fade-in">
-            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-4">Command Modules</h4>
-            <div class="bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-3.5 rounded-xl cursor-default font-semibold text-sm shadow-sm flex items-center gap-3 relative overflow-hidden">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-l-xl"></div>
-                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z"></path></svg>
-                Global Deployments
-            </div>
-            <div class="px-4 py-3.5 rounded-xl cursor-not-allowed font-medium text-slate-500 text-sm flex items-center gap-3 opacity-60 hover:bg-slate-50 transition-colors">
-                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
-                Analytics Matrix
-                <span class="ml-auto bg-slate-100 text-slate-400 text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">SOON</span>
-            </div>
-        </nav>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 lg:py-10">
 
-        <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-            <div class="flex items-center gap-3 mb-4 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
-                <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold border border-indigo-100 flex-shrink-0">SD</div>
-                <div class="overflow-hidden"><p class="text-sm font-bold text-slate-900 leading-none truncate">System Director</p><p class="text-[11px] text-slate-500 font-medium mt-1 truncate">hq@feehub.com</p></div>
-            </div>
-            <button onclick="logout()" class="w-full bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 text-[13px] font-bold py-2.5 rounded-xl transition-all flex justify-center gap-2 items-center group shadow-sm">
-                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Lock Workstation
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main content -->
-    <main class="flex-1 flex flex-col min-w-0 bg-transparent relative h-full z-10 overflow-x-hidden">
-
-        <header class="h-[80px] hq-header flex items-center justify-between px-4 sm:px-10 sticky top-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+        <!-- Desktop Header -->
+        <div class="hidden lg:flex items-center justify-between mb-10 animate-up">
             <div class="flex items-center gap-4">
-                <button onclick="toggleHqSidebar()" class="lg:hidden text-slate-500 hover:text-slate-800 transition-colors">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl shadow-indigo-500/20">FH</div>
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Active Deployments</h2>
-                    <p class="text-[12px] sm:text-[13px] text-slate-500 font-semibold tracking-wide hidden sm:block">Manage remote client instances worldwide.</p>
+                    <h1 class="text-2xl font-black text-slate-900 tracking-tight">Platform Control Center</h1>
+                    <p class="text-sm text-slate-500 font-medium">FeeHub HQ &middot; Master Administration</p>
                 </div>
             </div>
-            <button onclick="openModal()" class="relative group overflow-hidden bg-slate-900 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl transition-all duration-300 shadow-lg shadow-slate-900/20 active:scale-95 flex items-center gap-2 text-sm">
-                <span class="relative z-10 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-indigo-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                    <span class="hidden sm:inline">New Instance</span>
-                    <span class="sm:hidden">New</span>
-                </span>
-                <div class="absolute inset-0 bg-indigo-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
-            </button>
-        </header>
-
-        <div class="flex-1 overflow-y-auto overflow-x-hidden w-full p-4 sm:p-10 pb-20">
-            <div class="max-w-6xl mx-auto">
-
-                <!-- Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 slide-up">
-                    <div class="hq-card p-6 rounded-2xl relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-500">
-                            <svg class="w-24 h-24 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z"></path></svg>
-                        </div>
-                        <div class="relative z-10">
-                            <p class="text-slate-500 text-[11px] font-black uppercase tracking-widest mb-3 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"></span> Network Volume</p>
-                            <div class="flex items-baseline gap-3"><h3 class="text-5xl font-black text-slate-900 tracking-tight" id="statCount">0</h3><span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">+100% Operational</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Table -->
-                <div class="hq-card rounded-2xl overflow-hidden slide-up delay-100 flex flex-col">
-                    <div class="px-4 sm:px-8 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-[15px]">
-                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg> Instance Registry
-                        </h3>
-                        <div class="text-[11px] font-bold tracking-widest uppercase text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200 hidden sm:block">System Secure</div>
-                    </div>
-                    <div class="overflow-x-auto bg-white">
-                        <table class="w-full text-left border-collapse min-w-[700px]">
-                            <thead>
-                                <tr class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                                    <th class="py-4 px-4 sm:px-8 text-[11px] font-bold uppercase tracking-widest w-[40%]">Deployment Target</th>
-                                    <th class="py-4 px-4 sm:px-8 text-[11px] font-bold uppercase tracking-widest w-[30%]">Root Access Email</th>
-                                    <th class="py-4 px-4 sm:px-8 text-[11px] font-bold uppercase tracking-widest w-[15%]">Ping Status</th>
-                                    <th class="py-4 px-4 sm:px-8 text-[11px] font-bold uppercase tracking-widest w-[15%] text-right">Overrides</th>
-                                </tr>
-                            </thead>
-                            <tbody id="clientTableBody" class="divide-y divide-slate-100">
-                                <tr id="loadingRow"><td colspan="4" class="py-16 text-center text-slate-400 font-medium text-sm">
-                                    <svg class="animate-spin h-6 w-6 text-indigo-500 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                                    Establishing secure uplink...
-                                </td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
+            <div class="flex items-center gap-3">
+                <button onclick="openModal()" class="group relative overflow-hidden bg-slate-900 text-white font-bold py-3 px-7 rounded-2xl transition-all shadow-xl shadow-slate-900/15 active:scale-95 flex items-center gap-2.5 text-sm">
+                    <span class="relative z-10 flex items-center gap-2.5">
+                        <svg class="w-4 h-4 text-indigo-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                        Deploy Instance
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></div>
+                </button>
+                <button onclick="logout()" class="bg-white border border-slate-200 text-red-500 hover:bg-red-50 hover:border-red-200 font-bold px-5 py-3 rounded-2xl text-sm transition-all flex items-center gap-2 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Sign Out
+                </button>
             </div>
         </div>
-    </main>
 
-    <!-- Modal -->
-    <div id="OV" class="fixed inset-0 glass-modal z-[100] hidden items-center justify-center p-4 transition-opacity opacity-0 pointer-events-none duration-300">
-        <div class="bg-white rounded-[24px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] w-full max-w-[560px] overflow-hidden transform scale-95 transition-transform duration-300 relative border border-slate-200" id="OVContent">
-            <div class="px-6 sm:px-8 py-6 border-b border-slate-100 bg-white flex justify-between items-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-indigo-50 to-white z-0 pointer-events-none opacity-50"></div>
-                <div class="relative z-10">
-                    <h3 class="text-lg sm:text-[22px] font-black text-slate-900 tracking-tight">Deploy New Instance</h3>
-                    <p class="text-indigo-600 text-[11px] font-bold uppercase tracking-widest mt-1">Automated Realm Provisioning</p>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-8">
+            <div class="card p-4 sm:p-6 animate-up delay-1">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center"><svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z"></path></svg></div>
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400">Instances</span>
                 </div>
-                <button onclick="closeModal()" class="relative z-10 w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors flex-shrink-0">&#10005;</button>
+                <h3 class="text-3xl sm:text-4xl font-black text-slate-900" id="statInst">0</h3>
             </div>
+            <div class="card p-4 sm:p-6 animate-up delay-2">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center"><svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400">Users</span>
+                </div>
+                <h3 class="text-3xl sm:text-4xl font-black text-slate-900" id="statUsers">0</h3>
+            </div>
+            <div class="card p-4 sm:p-6 animate-up delay-3">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center"><svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400">Revenue</span>
+                </div>
+                <h3 class="text-2xl sm:text-4xl font-black text-emerald-600" id="statRevenue">&#8377;0</h3>
+            </div>
+            <div class="card p-4 sm:p-6 animate-up delay-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center"><svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div>
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-400">Uptime</span>
+                </div>
+                <h3 class="text-3xl sm:text-4xl font-black text-amber-600">99.9%</h3>
+            </div>
+        </div>
 
+        <!-- Instance Registry Table -->
+        <div class="card overflow-hidden animate-up delay-4">
+            <div class="px-4 sm:px-8 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base sm:text-lg">Instance Registry</h3>
+                    <p class="text-xs text-slate-500 font-medium">Live deployment targets across the network</p>
+                </div>
+                <div class="text-[10px] font-bold tracking-widest uppercase text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 self-start flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> All Systems Nominal
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[750px]">
+                    <thead>
+                        <tr class="bg-slate-50/80 border-b border-slate-100">
+                            <th class="py-4 px-4 sm:px-8 text-[10px] font-bold uppercase tracking-widest text-slate-400">Institution</th>
+                            <th class="py-4 px-4 sm:px-8 text-[10px] font-bold uppercase tracking-widest text-slate-400">Admin</th>
+                            <th class="py-4 px-4 sm:px-8 text-[10px] font-bold uppercase tracking-widest text-slate-400">Status</th>
+                            <th class="py-4 px-4 sm:px-8 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-50">
+                        <tr><td colspan="4" class="py-20 text-center">
+                            <svg class="animate-spin h-6 w-6 text-indigo-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            <p class="text-sm text-slate-400 font-medium">Connecting to network...</p>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deploy Modal -->
+    <div id="OV" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" style="background:rgba(15,23,42,0.4);backdrop-filter:blur(8px);">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-200" id="OVBox">
+            <div class="px-6 sm:px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-indigo-50/60 to-white">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">Deploy New Instance</h3>
+                    <p class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest mt-1">Automated Provisioning</p>
+                </div>
+                <button onclick="closeModal()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors">&#10005;</button>
+            </div>
             <div class="p-6 sm:p-8">
-                <form id="addClientForm" onsubmit="createInstitution(event)" class="space-y-7">
+                <form id="deployForm" onsubmit="createInstitution(event)" class="space-y-6">
                     <div>
-                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><span>1</span> Target Identification</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" id="iName" required placeholder="Institution Name (e.g. ABC College)" class="hq-input w-full px-5 py-3.5 rounded-xl text-sm font-semibold">
-                            <input type="text" id="iPhone" placeholder="Contact Phone" class="hq-input w-full px-5 py-3.5 rounded-xl text-sm font-semibold">
-                        </div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Institution Name</label>
+                        <input type="text" id="iName" required placeholder="e.g. ABC College of Engineering" class="input-hq">
                     </div>
-
-                    <div class="pt-1">
-                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><span>2</span> Root Administrator Protocol</h4>
-                        <div class="space-y-4">
-                            <input type="text" id="aName" required placeholder="Admin Full Name" class="hq-input w-full px-5 py-3.5 rounded-xl text-sm font-semibold">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="email" id="aEmail" required placeholder="Admin Login Email" class="hq-input w-full px-5 py-3.5 rounded-xl text-sm font-semibold">
-                                <input type="text" id="aPass" required placeholder="Temporary Genesis Password" class="hq-input w-full px-5 py-3.5 rounded-xl text-sm font-semibold">
-                            </div>
-                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Admin Name</label><input type="text" id="aName" required placeholder="Full Name" class="input-hq"></div>
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Contact Phone</label><input type="text" id="iPhone" placeholder="Phone (optional)" class="input-hq"></div>
                     </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Login Email</label><input type="email" id="aEmail" required placeholder="admin@college.com" class="input-hq"></div>
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Temp Password</label><input type="text" id="aPass" required placeholder="Set initial password" class="input-hq"></div>
+                    </div>
+                    <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3">
+                        <button type="button" onclick="closeModal()" class="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-all text-sm text-center">Cancel</button>
+                        <button type="submit" id="deployBtn" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-3 px-8 rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 active:scale-95 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Deploy
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                    <div class="pt-6 mt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-3">
-                        <button type="button" onclick="closeModal()" class="px-6 py-3 rounded-xl font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all text-sm">Cancel</button>
-                        <button type="submit" id="saveBtn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all flex items-center justify-center gap-2 active:scale-95 text-[13px] uppercase tracking-wider">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            Execute Deployment
+    <!-- Edit Modal -->
+    <div id="editOV" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" style="background:rgba(15,23,42,0.4);backdrop-filter:blur(8px);">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
+            <div class="px-6 sm:px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-amber-50/60 to-white">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">Edit Instance</h3>
+                    <p class="text-amber-600 text-[10px] font-bold uppercase tracking-widest mt-1">Modify Configuration</p>
+                </div>
+                <button onclick="closeEditModal()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors">&#10005;</button>
+            </div>
+            <div class="p-6 sm:p-8">
+                <form id="editForm" onsubmit="saveEdit(event)" class="space-y-5">
+                    <input type="hidden" id="editId">
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Institution Name</label><input type="text" id="editInstName" required class="input-hq"></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Admin Name</label><input type="text" id="editAdminName" required class="input-hq"></div>
+                    <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-all text-sm text-center">Cancel</button>
+                        <button type="submit" id="editBtn" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-3 px-8 rounded-xl hover:shadow-lg hover:shadow-amber-500/25 transition-all flex items-center justify-center gap-2 active:scale-95 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Save Changes
                         </button>
                     </div>
                 </form>
@@ -255,187 +203,166 @@
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed bottom-6 right-6 left-6 sm:left-auto bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[200] flex items-center gap-3 font-semibold text-sm">
-        <svg class="w-5 h-5 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div id="toast" class="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-24 opacity-0 transition-all duration-300 z-[200] flex items-center gap-3 font-semibold text-sm">
+        <span id="toastIcon" class="flex-shrink-0">&#9889;</span>
         <span id="toastMsg">Notification</span>
     </div>
 
-    <script>
-        const token = localStorage.getItem('feehub_token');
-        if (!token) window.location.replace('hq-login.html');
+<script>
+const token = localStorage.getItem('feehub_token');
+if (!token) window.location.replace('hq-login.html');
 
-        function logout() {
-            localStorage.removeItem('feehub_token');
-            window.location.replace('hq-login.html');
+const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+const fmtShort = n => { n = Number(n); if (n >= 10000000) return '₹' + (n/10000000).toFixed(1) + 'Cr'; if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L'; if (n >= 1000) return '₹' + (n/1000).toFixed(1) + 'K'; return '₹' + n; };
+
+function logout() { localStorage.removeItem('feehub_token'); window.location.replace('hq-login.html'); }
+
+function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    document.getElementById('toastIcon').innerHTML = isError ? '&#10060;' : '&#9889;';
+    t.className = t.className.replace('bg-red-600', 'bg-slate-900').replace('bg-slate-900', isError ? 'bg-red-600' : 'bg-slate-900');
+    t.classList.remove('translate-y-24', 'opacity-0');
+    setTimeout(() => t.classList.add('translate-y-24', 'opacity-0'), 3500);
+}
+
+/* Deploy Modal */
+function openModal() {
+    const m = document.getElementById('OV'); m.classList.replace('hidden','flex');
+    setTimeout(() => document.getElementById('OVBox').classList.replace('scale-95','scale-100'), 10);
+}
+function closeModal() {
+    document.getElementById('OVBox').classList.replace('scale-100','scale-95');
+    setTimeout(() => { document.getElementById('OV').classList.replace('flex','hidden'); document.getElementById('deployForm').reset(); }, 250);
+}
+
+/* Edit Modal */
+function openEditModal(id, instName, adminName) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editInstName').value = instName;
+    document.getElementById('editAdminName').value = adminName;
+    document.getElementById('editOV').classList.replace('hidden','flex');
+}
+function closeEditModal() { document.getElementById('editOV').classList.replace('flex','hidden'); }
+
+async function saveEdit(e) {
+    e.preventDefault();
+    const id = document.getElementById('editId').value;
+    const btn = document.getElementById('editBtn'); const orig = btn.innerHTML;
+    btn.innerHTML = 'Saving...'; btn.disabled = true;
+    try {
+        const res = await fetch(`/api/hq/institutions/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ name: document.getElementById('editInstName').value, adminName: document.getElementById('editAdminName').value })
+        });
+        const data = await res.json();
+        if (data.success) { closeEditModal(); showToast('Instance updated successfully.'); setTimeout(loadDashboard, 400); }
+        else showToast(data.message, true);
+    } catch(e) { showToast('Update failed.', true); }
+    btn.innerHTML = orig; btn.disabled = false;
+}
+
+async function loadDashboard() {
+    try {
+        const res = await fetch('/api/hq/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (!data.success) { if (res.status === 403) { alert('SuperAdmin access required.'); logout(); } return; }
+
+        const d = data.data;
+        const clients = d.institutions.filter(i => i.email !== 'hq@feehub.com');
+
+        document.getElementById('statInst').textContent = d.totalInstitutions;
+        document.getElementById('statUsers').textContent = d.totalPlatformUsers;
+        document.getElementById('statRevenue').textContent = fmtShort(d.totalPlatformRevenue);
+
+        const tbody = document.getElementById('tableBody');
+        if (clients.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="py-20 text-center"><p class="text-slate-400 font-semibold text-base mb-2">No instances deployed yet</p><p class="text-slate-400 text-sm">Click "Deploy Instance" to create your first one.</p></td></tr>`;
+            return;
         }
 
-        function toggleHqSidebar() {
-            const sidebar = document.getElementById('hqSidebar');
-            const overlay = document.getElementById('hqSidebarOverlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
+        tbody.innerHTML = clients.map((inst, i) => {
+            const off = inst.isActive === false;
+            const sc = off ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100';
+            const dc = off ? 'bg-red-500' : 'bg-emerald-500 animate-pulse';
+            const st = off ? 'Suspended' : 'Online';
+            const an = inst.adminName || 'N/A';
+            const ae = inst.adminEmail || inst.email || '';
+            return `
+            <tr class="group hover:bg-indigo-50/30 transition-all duration-200 animate-up" style="animation-delay:${i*50}ms">
+                <td class="py-5 px-4 sm:px-8">
+                    <p class="font-bold text-slate-900 text-sm group-hover:text-indigo-700 transition-colors">${inst.name}</p>
+                    <p class="text-[10px] text-slate-400 font-mono mt-0.5 truncate max-w-[180px]">${inst._id}</p>
+                </td>
+                <td class="py-5 px-4 sm:px-8">
+                    <p class="font-semibold text-slate-700 text-sm">${an}</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5 truncate max-w-[180px]">${ae}</p>
+                </td>
+                <td class="py-5 px-4 sm:px-8">
+                    <span class="inline-flex items-center gap-1.5 border px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${sc}">
+                        <span class="w-1.5 h-1.5 rounded-full ${dc}"></span> ${st}
+                    </span>
+                </td>
+                <td class="py-5 px-4 sm:px-8">
+                    <div class="flex items-center justify-end gap-1.5">
+                        <button onclick="openEditModal('${inst._id}','${inst.name.replace(/'/g,"\\'")}','${an.replace(/'/g,"\\'")}')" class="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 p-2 rounded-xl border border-transparent hover:border-indigo-100 transition-all" title="Edit">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <button onclick="toggleInstitution('${inst._id}')" class="${off ? 'text-emerald-500 hover:bg-emerald-50 hover:border-emerald-100' : 'text-amber-500 hover:bg-amber-50 hover:border-amber-100'} p-2 rounded-xl border border-transparent transition-all" title="${off ? 'Activate' : 'Suspend'}">
+                            ${off ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'}
+                        </button>
+                        <button onclick="deleteInstitution('${inst._id}','${inst.name.replace(/'/g,"\\'")}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 hover:border-red-100 p-2 rounded-xl border border-transparent transition-all" title="Terminate">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch(e) {
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="4" class="py-20 text-center text-red-500 font-semibold">Failed to connect to HQ server.</td></tr>`;
+    }
+}
 
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            if (isError) toast.classList.replace('bg-slate-900', 'bg-red-600');
-            else toast.classList.replace('bg-red-600', 'bg-slate-900');
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
-        }
+async function createInstitution(e) {
+    e.preventDefault();
+    const btn = document.getElementById('deployBtn'); const orig = btn.innerHTML;
+    btn.innerHTML = '<svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Deploying...';
+    btn.disabled = true;
+    try {
+        const res = await fetch('/api/auth/register', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ institutionName: document.getElementById('iName').value, adminName: document.getElementById('aName').value, email: document.getElementById('aEmail').value, password: document.getElementById('aPass').value })
+        });
+        const data = await res.json();
+        if (data.success) { closeModal(); showToast('Instance deployed successfully!'); setTimeout(loadDashboard, 400); }
+        else showToast('Deploy failed: ' + data.message, true);
+    } catch(e) { showToast('Connection failed.', true); }
+    btn.innerHTML = orig; btn.disabled = false;
+}
 
-        const OVElem = document.getElementById('OV');
-        const OVContent = document.getElementById('OVContent');
+async function deleteInstitution(id, name) {
+    const p = prompt(`WARNING! This permanently destroys "${name}" and all its data.\n\nType the institution name to confirm:`);
+    if (p !== name) return;
+    try {
+        const res = await fetch(`/api/hq/institutions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) { showToast('Instance terminated.'); loadDashboard(); }
+        else showToast(data.message, true);
+    } catch(e) { showToast('Termination failed.', true); }
+}
 
-        function openModal() {
-            OVElem.classList.replace('hidden', 'flex');
-            setTimeout(() => {
-                OVElem.classList.remove('opacity-0', 'pointer-events-none');
-                OVContent.classList.remove('scale-95');
-                OVContent.classList.add('scale-100');
-            }, 10);
-        }
+async function toggleInstitution(id) {
+    if (!confirm('Toggle the status of this institution? Suspended instances cannot log in.')) return;
+    try {
+        const res = await fetch(`/api/hq/institutions/${id}/toggle`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) { showToast(data.message); loadDashboard(); }
+        else showToast(data.message, true);
+    } catch(e) { showToast('Toggle failed.', true); }
+}
 
-        function closeModal() {
-            OVElem.classList.add('opacity-0', 'pointer-events-none');
-            OVContent.classList.remove('scale-100');
-            OVContent.classList.add('scale-95');
-            setTimeout(() => {
-                OVElem.classList.replace('flex', 'hidden');
-                document.getElementById('addClientForm').reset();
-            }, 300);
-        }
-
-        async function fetchInstitutions() {
-            try {
-                const res = await fetch('/api/hq/institutions', { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-
-                if (!data.success) {
-                    if (data.message.includes('Access Denied')) {
-                        alert("UNAUTHORIZED DEVIATION LOGGED. Super Admin clearance required.");
-                        window.location.replace('login.html');
-                    }
-                    return;
-                }
-
-                const clients = data.data.filter(i => i.email !== 'hq@feehub.com');
-                document.getElementById('statCount').textContent = clients.length;
-                const tbody = document.getElementById('clientTableBody');
-
-                if (clients.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="py-16 text-center text-slate-400 font-medium text-[15px] bg-slate-50/50">No client instances detected. Initialize one.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = clients.map((inst, idx) => {
-                    const isSuspended = inst.isActive === false;
-                    const statusColor = isSuspended ? 'bg-red-50 text-red-700 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
-                    const dotColor = isSuspended ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]';
-                    const statusText = isSuspended ? 'Suspended' : 'Online';
-
-                    return `
-                    <tr class="group hover:bg-slate-50/80 hover:shadow-sm transition-all duration-300 tr-animate bg-white" style="animation-delay: ${idx * 40}ms">
-                        <td class="py-5 px-4 sm:px-8">
-                            <p class="font-black text-slate-800 text-sm sm:text-[15.5px] tracking-tight group-hover:text-indigo-600 transition-colors">${inst.name}</p>
-                            <p class="text-[10px] text-slate-400 font-mono mt-1 tracking-tight truncate">UUID: ${inst._id}</p>
-                        </td>
-                        <td class="py-5 px-4 sm:px-8">
-                            <div class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs sm:text-[13.5px] text-slate-600 font-semibold shadow-sm">
-                                <svg class="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                <span class="truncate">${inst.adminEmail}</span>
-                            </div>
-                        </td>
-                        <td class="py-5 px-4 sm:px-8">
-                            <div class="inline-flex items-center gap-2 border px-3 py-1.5 rounded-md text-[10.5px] font-black uppercase tracking-widest ${statusColor}">
-                                <span class="w-2 h-2 rounded-full ${dotColor}"></span> ${statusText}
-                            </div>
-                        </td>
-                        <td class="py-5 px-4 sm:px-8">
-                            <div class="flex items-center justify-end gap-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-                                <button onclick="toggleInstitution('${inst._id}')" class="${isSuspended ? 'text-emerald-600 hover:bg-emerald-50 border-emerald-200' : 'text-amber-600 hover:bg-amber-50 border-amber-200'} font-bold text-[10px] uppercase tracking-wider bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border transition-all flex items-center justify-center gap-1.5 shadow-sm hover:-translate-y-0.5">
-                                    ${isSuspended ? '&#9654; Start' : '&#9208; Suspend'}
-                                </button>
-                                <button onclick="deleteInstitution('${inst._id}', '${inst.name}')" class="text-slate-400 hover:text-red-600 font-bold text-[10px] uppercase tracking-wider bg-white hover:bg-red-50 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-slate-200 hover:border-red-200 transition-all flex items-center justify-center gap-1.5 shadow-sm hover:-translate-y-0.5">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> <span class="hidden sm:inline">Terminate</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                }).join('');
-            } catch (e) {
-                document.getElementById('loadingRow').innerHTML = `<td colspan="4" class="py-16 text-center text-red-500 font-medium bg-red-50">Error establishing secure link to HQ Server.</td>`;
-            }
-        }
-
-        async function createInstitution(e) {
-            e.preventDefault();
-            const btn = document.getElementById('saveBtn');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = `<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Deploying...`;
-            btn.disabled = true;
-
-            const payload = {
-                name: document.getElementById('iName').value,
-                phone: document.getElementById('iPhone').value,
-                adminName: document.getElementById('aName').value,
-                adminEmail: document.getElementById('aEmail').value,
-                adminPassword: document.getElementById('aPass').value
-            };
-
-            try {
-                const res = await fetch('/api/hq/institutions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    closeModal();
-                    showToast("Instance successfully deployed & provisioned.");
-                    setTimeout(fetchInstitutions, 500);
-                } else {
-                    showToast("DEPLOYMENT HALTED: " + data.message, true);
-                }
-            } catch (e) { showToast("Connection failed.", true); }
-
-            btn.innerHTML = originalContent;
-            btn.disabled = false;
-        }
-
-        async function deleteInstitution(id, name) {
-            const dangerPrompt = prompt(`WARNING! Terminating [${name}] destroys the instance and drops all data. Type "${name}" to proceed:`);
-            if (dangerPrompt !== name) return;
-
-            try {
-                const res = await fetch(`/api/hq/institutions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                if (data.success) {
-                    showToast("Instance permanently terminated.");
-                    fetchInstitutions();
-                } else { showToast(data.message, true); }
-            } catch (e) { showToast("Termination procedure failed.", true); }
-        }
-
-        async function toggleInstitution(id) {
-            if (!confirm("Are you sure you want to change the status of this institution? Offline institutions cannot login.")) return;
-            try {
-                const res = await fetch(`/api/hq/institutions/${id}/toggle`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showToast(data.message);
-                    fetchInstitutions();
-                } else { showToast(data.message, true); }
-            } catch (e) { showToast("Status toggle failed.", true); }
-        }
-
-        document.addEventListener('DOMContentLoaded', fetchInstitutions);
-    </script>
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
 </body>
 </html>

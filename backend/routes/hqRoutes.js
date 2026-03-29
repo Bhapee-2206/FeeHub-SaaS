@@ -55,13 +55,11 @@ router.get('/dashboard', protect, superAdminOnly, async (req, res) => {
 // @desc    Suspend or Reactivate an institution
 router.put('/institutions/:id/toggle', protect, superAdminOnly, async (req, res) => {
     try {
-        const institution = await Institution.findByIdAndUpdate(
-            req.params.id,
-            { isActive: req.body.isActive },
-            { new: true }
-        );
+        const institution = await Institution.findById(req.params.id);
         if (!institution) return res.status(404).json({ success: false, message: 'Tenant not found' });
-        res.json({ success: true, message: 'Tenant status updated.' });
+        institution.isActive = !institution.isActive;
+        await institution.save();
+        res.json({ success: true, message: institution.isActive ? 'Instance is now Online.' : 'Instance has been Suspended.' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -83,6 +81,29 @@ router.delete('/institutions/:id', protect, superAdminOnly, async (req, res) => 
         await Institution.findByIdAndDelete(instId);
 
         res.json({ success: true, message: 'Tenant completely erased.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// @route   PUT /api/hq/institutions/:id
+// @desc    Edit institution name and/or admin name
+router.put('/institutions/:id', protect, superAdminOnly, async (req, res) => {
+    try {
+        const { name, adminName } = req.body;
+        const instId = req.params.id;
+
+        if (name) {
+            await Institution.findByIdAndUpdate(instId, { name });
+        }
+        if (adminName) {
+            await User.findOneAndUpdate(
+                { institutionId: instId, role: 'InstitutionAdmin' },
+                { name: adminName }
+            );
+        }
+
+        res.json({ success: true, message: 'Institution updated successfully.' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
