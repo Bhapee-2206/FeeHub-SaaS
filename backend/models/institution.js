@@ -29,6 +29,10 @@ const institutionSchema = new mongoose.Schema({
         enum: ['Free Beta', 'Pro', 'Enterprise'],
         default: 'Free Beta' 
     },
+    logo: {
+        type: String,
+        default: ''
+    },
     isActive: {
         type: Boolean,
         default: true

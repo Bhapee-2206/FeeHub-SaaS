@@ -18,12 +18,15 @@ router.get('/stats', protect, async (req, res) => {
         const user = await User.findById(req.user._id);
         
         let instName = "FeeHub Institution";
-        
+        let instLogo = '';
         
         if (institutionId && institutionId !== "null") {
             try {
                 const institution = await Institution.findById(institutionId);
-                if (institution) instName = institution.name;
+                if (institution) {
+                    instName = institution.name;
+                    instLogo = institution.logo || '';
+                }
             } catch (err) {
                 console.log("Institution fallback triggered.");
             }
@@ -45,8 +48,10 @@ router.get('/stats', protect, async (req, res) => {
             success: true,
             data: {
                 userName: user ? user.name : 'Admin',
+                userId: user ? user._id : null,
                 userRole: user ? user.role : 'Staff',
                 institutionName: instName,
+                institutionLogo: instLogo,
                 totalCollected,
                 pendingDues,
                 totalStudents: activeStudents,
@@ -80,4 +85,39 @@ router.get('/student-profile', protect, async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
+// ─── Update Institution Settings (Admin Name, Institution Name, Logo) ───
+router.put('/settings', protect, async (req, res) => {
+    try {
+        // Only admins can update settings
+        if (req.user.role !== 'InstitutionAdmin') {
+            return res.status(403).json({ success: false, message: 'Only admins can update settings.' });
+        }
+
+        const { adminName, institutionName, logo } = req.body;
+        const institutionId = req.user.institutionId;
+
+        // Update admin name
+        if (adminName && adminName.trim()) {
+            await User.findByIdAndUpdate(req.user._id, { name: adminName.trim() });
+        }
+
+        // Update institution name and logo
+        if (institutionId) {
+            const updateData = {};
+            if (institutionName && institutionName.trim()) updateData.name = institutionName.trim();
+            if (logo !== undefined) updateData.logo = logo; // allow empty string to clear logo
+            
+            if (Object.keys(updateData).length > 0) {
+                await Institution.findByIdAndUpdate(institutionId, updateData);
+            }
+        }
+
+        res.json({ success: true, message: 'Settings updated successfully.' });
+    } catch (error) {
+        console.error('Settings update error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 module.exports = router;

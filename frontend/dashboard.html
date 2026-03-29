@@ -150,7 +150,7 @@
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-indigo-500/20 rounded-full blur-[60px] pointer-events-none"></div>
             <div class="h-[72px] flex items-center justify-between px-5 border-b border-white/[0.06] relative">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[13px] flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[13px] flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 overflow-hidden" id="sidebarLogo">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z" /></svg>
                     </div>
                     <div>
@@ -161,15 +161,19 @@
                 <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <nav class="flex-1 overflow-y-auto py-5 px-3 space-y-1" id="NAV"></nav>
+            <!-- Sign Out Button - moved up above user info for mobile visibility -->
+            <div class="px-3 pt-2">
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 py-2.5 rounded-xl transition-all text-[13px] font-semibold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Sign Out</button>
+            </div>
             <div class="p-3 border-t border-white/[0.06]">
-                <div class="bg-white/[0.05] rounded-[14px] p-3.5 mb-2 flex items-center gap-3 hover:bg-white/[0.08] transition-all cursor-pointer group">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md shadow-indigo-500/20 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-shadow" id="AV">...</div>
-                    <div class="overflow-hidden">
+                <div onclick="openSettingsModal()" class="bg-white/[0.05] rounded-[14px] p-3.5 flex items-center gap-3 hover:bg-white/[0.08] transition-all cursor-pointer group">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md shadow-indigo-500/20 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-shadow overflow-hidden" id="AV">...</div>
+                    <div class="overflow-hidden flex-1">
                         <p class="text-white text-[13px] font-semibold truncate" id="SUN">Loading...</p>
                         <p class="text-slate-400 text-[11px] truncate capitalize" id="SUR">...</p>
                     </div>
+                    <svg class="w-4 h-4 text-slate-500 group-hover:text-indigo-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </div>
-                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 py-2.5 rounded-xl transition-all text-[13px] font-semibold"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Sign Out</button>
             </div>
         </aside>
         <main class="flex-1 flex flex-col min-w-0 relative h-full overflow-x-hidden bg-[#f4f6f9]">
@@ -237,7 +241,7 @@
         if (!token) window.location.replace('login.html');
 
         let PAGE = 'dashboard';
-        let CU = { name: 'Loading...', role: 'staff', institutionName: 'FeeHub Institution' };
+        let CU = { name: 'Loading...', role: 'staff', institutionName: 'FeeHub Institution', institutionLogo: '' };
         let DASH_DATA = null; let STUDENTS = []; let PAYMENTS = []; let FEE_STRUCTURES = []; let COURSES = []; let STAFF_DATA = []; let ACTIVE_COURSE_FILTER = 'All';
         let STU_SEARCH_TERM = ''; let PAY_SEARCH_TERM = '';
 
@@ -293,9 +297,11 @@
                     DASH_DATA = result.data;
                     CU.name = DASH_DATA.userName || 'Admin';
                     CU.institutionName = DASH_DATA.institutionName || 'FeeHub Institution';
+                    CU.institutionLogo = DASH_DATA.institutionLogo || '';
                     CU.role = (DASH_DATA.userRole === 'InstitutionAdmin' || DASH_DATA.userRole === 'SuperAdmin') ? 'admin' : 'staff';
 
                     G('headerInstName').textContent = CU.institutionName;
+                    updateSidebarLogo();
 
                     await Promise.all([fetchStudents(), fetchPayments(), fetchFees(), fetchCourses(), fetchStaffData()]);
                     initDashboard();
@@ -313,8 +319,22 @@
         async function fetchCourses() { try { const res = await fetch('/api/courses', { headers: { 'Authorization': `Bearer ${token}` } }); const result = await res.json(); if (result.success) COURSES = result.data; } catch (e) { } }
         async function fetchStaffData() { try { const res = await fetch('/api/staff', { headers: { 'Authorization': `Bearer ${token}` } }); const result = await res.json(); if (result.success) STAFF_DATA = result.data; } catch (e) { } }
 
+        function updateSidebarLogo() {
+            const logoEl = G('sidebarLogo');
+            if (CU.institutionLogo && logoEl) {
+                logoEl.innerHTML = `<img src="${CU.institutionLogo}" class="w-full h-full object-cover" alt="Logo">`;
+            }
+            // Update avatar with logo if available
+            const avEl = G('AV');
+            if (CU.institutionLogo && avEl) {
+                avEl.innerHTML = `<img src="${CU.institutionLogo}" class="w-full h-full object-cover rounded-full" alt="Logo">`;
+            } else if (avEl) {
+                avEl.textContent = ini(CU.name);
+            }
+        }
+
         function initDashboard() {
-            G('SUN').textContent = CU.name; G('SUR').textContent = CU.role === 'admin' ? 'Administrator' : 'Staff Member'; G('AV').textContent = ini(CU.name);
+            G('SUN').textContent = CU.name; G('SUR').textContent = CU.role === 'admin' ? 'Administrator' : 'Staff Member'; updateSidebarLogo();
             G('APP').style.opacity = '1'; buildNav(); render(); startClock();
         }
 
@@ -1142,6 +1162,140 @@
 
             fileInput.click();
         }
+
+        // ═══════════════════ INSTITUTION SETTINGS MODAL ═══════════════════
+        let SETTINGS_LOGO_DATA = null; // holds the new logo base64
+
+        function openSettingsModal() {
+            if (CU.role !== 'admin') {
+                showToast('Only admins can edit settings.', 'error');
+                return;
+            }
+            SETTINGS_LOGO_DATA = null;
+            G('MTL').textContent = 'Institution Settings';
+
+            const currentLogo = CU.institutionLogo || '';
+            const logoPreviewHTML = currentLogo 
+                ? `<img src="${currentLogo}" class="w-full h-full object-cover" id="settingsLogoPreview">`
+                : `<div class="flex flex-col items-center justify-center text-slate-400" id="settingsLogoPreview">
+                    <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-[10px] font-bold">No Logo</span>
+                   </div>`;
+
+            G('MBD').innerHTML = `
+        <form onsubmit="saveSettings(event)" class="space-y-5">
+            <!-- Logo Upload Section -->
+            <div class="flex flex-col items-center">
+                <div class="relative group">
+                    <div class="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-400 group-hover:bg-indigo-50/30" id="settingsLogoContainer">
+                        ${logoPreviewHTML}
+                    </div>
+                    <button type="button" onclick="document.getElementById('logoFileInput').click()" class="absolute -bottom-2 -right-2 w-9 h-9 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 transition-all hover:scale-110 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </button>
+                    ${currentLogo ? `<button type="button" onclick="removeSettingsLogo()" class="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-all text-xs font-bold" title="Remove logo">✕</button>` : ''}
+                </div>
+                <input type="file" id="logoFileInput" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="hidden" onchange="handleLogoSelect(event)">
+                <p class="text-[11px] text-slate-400 font-medium mt-3">Upload institution logo (PNG, JPG, WebP — max 2MB)</p>
+            </div>
+
+            <!-- Admin Name -->
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Admin Name</label>
+                <input type="text" id="setAdminName" value="${CU.name}" required placeholder="Your name" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 text-sm font-medium transition-all">
+            </div>
+
+            <!-- Institution Name -->
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Institution Name</label>
+                <input type="text" id="setInstName" value="${CU.institutionName}" required placeholder="Your institution name" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 text-sm font-medium transition-all">
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                <button type="button" onclick="closeM()" class="px-6 py-2.5 rounded-xl font-bold border border-slate-200 text-slate-600 text-sm hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit" id="saveSettingsBtn" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-indigo-500/25 text-sm hover:shadow-indigo-500/40 transition-all active:scale-95">Save Changes</button>
+            </div>
+        </form>`;
+            G('OV').classList.replace('hidden', 'flex');
+        }
+
+        function handleLogoSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { showToast('Logo must be under 2MB.', 'error'); return; }
+            if (!['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'].includes(file.type)) { showToast('Unsupported file type.', 'error'); return; }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                SETTINGS_LOGO_DATA = e.target.result;
+                const container = G('settingsLogoContainer');
+                container.innerHTML = `<img src="${SETTINGS_LOGO_DATA}" class="w-full h-full object-cover" id="settingsLogoPreview">`;
+                // Add remove button if not present
+                const parent = container.parentElement;
+                if (!parent.querySelector('.remove-logo-btn')) {
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'remove-logo-btn absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-all text-xs font-bold';
+                    removeBtn.title = 'Remove logo';
+                    removeBtn.textContent = '✕';
+                    removeBtn.onclick = () => removeSettingsLogo();
+                    parent.appendChild(removeBtn);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeSettingsLogo() {
+            SETTINGS_LOGO_DATA = ''; // empty string = clear logo
+            const container = G('settingsLogoContainer');
+            container.innerHTML = `<div class="flex flex-col items-center justify-center text-slate-400" id="settingsLogoPreview">
+                <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span class="text-[10px] font-bold">No Logo</span>
+            </div>`;
+            // Remove the remove button
+            const parent = container.parentElement;
+            const removeBtn = parent.querySelector('.remove-logo-btn');
+            if (removeBtn) removeBtn.remove();
+            // Also remove the static one
+            const staticRemoveBtn = parent.querySelector('button[title="Remove logo"]');
+            if (staticRemoveBtn) staticRemoveBtn.remove();
+        }
+
+        async function saveSettings(e) {
+            e.preventDefault();
+            const btn = G('saveSettingsBtn');
+            btn.disabled = true; btn.textContent = 'Saving...';
+
+            const payload = {
+                adminName: G('setAdminName').value,
+                institutionName: G('setInstName').value
+            };
+            // Only include logo if changed
+            if (SETTINGS_LOGO_DATA !== null) {
+                payload.logo = SETTINGS_LOGO_DATA;
+            }
+
+            try {
+                const res = await fetch('/api/dashboard/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    closeM();
+                    showToast('Settings updated successfully!');
+                    fetchDashboardData(); // Reload everything
+                } else {
+                    showToast(data.message, 'error');
+                    btn.disabled = false; btn.textContent = 'Save Changes';
+                }
+            } catch (err) {
+                showToast('Server error. Please try again.', 'error');
+                btn.disabled = false; btn.textContent = 'Save Changes';
+            }
+        }
+
         // BOOT ENGINE
         fetchDashboardData();
     </script>
