@@ -3,7 +3,7 @@ const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const Institution = require('../models/institution');
 const User = require('../models/user');
-const Student = require('../models/Student');
+const Student = require('../models/student');
 const Payment = require('../models/Payment');
 
 // Middleware: Strict SuperAdmin Only Gatekeeper

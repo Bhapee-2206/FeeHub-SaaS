@@ -1,6 +1,6 @@
 const Institution = require('../models/institution');
 const User = require('../models/user');
-const Student = require('../models/Student');
+const Student = require('../models/student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
