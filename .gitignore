@@ -9,3 +9,17 @@ backend/.env
 
 # OS generated files
 .DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Test / debug scripts (not needed in production)
+backend/test-*.js
+backend/test_*.js
+backend/check-*.js
+backend/update-password.js
+
+# Lock files at root (only backend lock file matters)
+package-lock.json

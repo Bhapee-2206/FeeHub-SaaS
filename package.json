@@ -1,5 +1,12 @@
 {
-  "dependencies": {
-    "mongodb": "3.7"
+  "name": "feehub-saas",
+  "version": "1.0.0",
+  "description": "FeeHub - Smart Fee Management SaaS for Educational Institutions",
+  "scripts": {
+    "start": "node backend/server.js",
+    "install-server": "cd backend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

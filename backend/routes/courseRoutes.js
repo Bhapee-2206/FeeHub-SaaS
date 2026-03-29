@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 
-const Course = require('../models/Course'); 
+const Course = require('../models/course'); 
 
 
 router.get('/', protect, async (req, res) => {

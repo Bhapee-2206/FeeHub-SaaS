@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const helmet = require('helmet');
 
 // Load environment variables
 dotenv.config();
@@ -10,7 +11,18 @@ dotenv.config();
 // Initialize the Express app
 const app = express();
 
-// Middleware
+// ─── Production Security ───
+// Trust Render's reverse proxy (required for correct HTTPS detection)
+app.set('trust proxy', 1);
+
+// Helmet CSP is disabled for now since we load CDN scripts (Tailwind, Chart.js, etc.)
+// You can re-enable and whitelist domains later for extra hardening
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+}));
+
+// ─── CORS ───
 app.use(cors());
 
 // Fix for strict body-parser charset error (strips quotes from Content-Type if injected by browser/proxy)
@@ -23,15 +35,15 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Database Connection
+// ─── Database Connection ───
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB Connected Successfully'))
     .catch(err => {
-        console.error('❌ MongoDB Connection Error:', err);
+        console.error('❌ MongoDB Connection Error:', err.message);
         process.exit(1);
     });
 
-// API Routes
+// ─── API Routes ───
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/students', require('./routes/studentRoutes'));
@@ -41,11 +53,10 @@ app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/staff', require('./routes/staffRoutes'));
 app.use('/api/hq', require('./routes/hqRoutes'));
 
-// Serve Frontend Files (Crucial for CSS/HTML to sync!)
+// ─── Serve Frontend (static files) ───
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// 🔥 THE FIX: Express 5.x Safe Catch-All Route 
-// (Replaces the broken app.get('*') method)
+// SPA-style catch-all: serve login.html for any non-API GET request
 app.use((req, res, next) => {
     if (req.method === 'GET' && !req.path.startsWith('/api')) {
         res.sendFile(path.join(__dirname, '../frontend/login.html'));
@@ -54,20 +65,20 @@ app.use((req, res, next) => {
     }
 });
 
-// Error Handling Middleware
+// ─── Error Handling ───
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
         success: false,
-        message: err.message || 'Server Error'
+        message: process.env.NODE_ENV === 'production' ? 'Server Error' : err.message
     });
 });
 
-// Start the Server
+// ─── Start Server ───
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log('---------------------------------------');
+app.listen(PORT, '0.0.0.0', () => {
+    console.log('───────────────────────────────────────');
     console.log(`🚀 FeeHub Engine running on port ${PORT}`);
-    console.log(`🌐 Local Access: http://localhost:${PORT}`);
-    console.log('---------------------------------------');
+    console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log('───────────────────────────────────────');
 });
