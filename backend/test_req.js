@@ -1,0 +1,1 @@
+fetch('/auth/login', {method:'POST', headers:{'Content-Type':'application/json; charset=\"UTF-8\"'}, body:JSON.stringify({email:'director@feehub.com',password:'master123'})}).then(r=>r.json()).then(console.log).catch(console.error);

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In | FeeHub Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .smooth-transition { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        /* Slick Form Animations */
+        .form-enter { animation: formFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes formFadeIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Animated Tab Background */
+        .tab-bg { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .tab-staff .tab-bg { transform: translateX(0%); }
+        .tab-student .tab-bg { transform: translateX(100%); }
+    </style>
+</head>
+<body class="flex min-h-screen selection:bg-blue-200 selection:text-blue-900">
+
+    <div class="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden flex-col justify-center p-16">
+        <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none mix-blend-screen"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none mix-blend-screen"></div>
+        
+        <div class="relative z-10 max-w-lg">
+            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-xl shadow-blue-600/30 mb-8">FH</div>
+            <h2 class="text-4xl font-black text-white mb-6 leading-tight tracking-tight">The smart financial engine for modern campuses.</h2>
+            <p class="text-slate-400 text-lg leading-relaxed mb-12">Seamless fee collections, automated digital receipts, and real-time ledger synchronizations for institutions globally.</p>
+            
+            <div class="flex items-center gap-4 text-sm font-semibold text-slate-500">
+                <div class="flex -space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-slate-300">A</div>
+                    <div class="w-10 h-10 rounded-full bg-slate-700 border-2 border-slate-900 flex items-center justify-center text-slate-300">B</div>
+                    <div class="w-10 h-10 rounded-full bg-slate-600 border-2 border-slate-900 flex items-center justify-center text-slate-300">C</div>
+                </div>
+                <p>Trusted by 10,000+ students daily.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative bg-white">
+        
+        <div class="w-full max-w-[400px] form-enter lg:mt-0 mt-6 md:mt-0">
+            <div class="flex lg:hidden items-center justify-center sm:justify-start gap-2 mb-8">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md">FH</div>
+                <span class="text-xl font-extrabold text-slate-900 tracking-tight">FeeHub</span>
+            </div>
+
+            <div class="mb-8 text-center sm:text-left">
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight mb-2">Welcome back</h1>
+                <p class="text-slate-500 font-medium">Please enter your details to sign in.</p>
+            </div>
+
+            <div id="tabContainer" class="tab-staff relative flex p-1 bg-slate-100 rounded-xl mb-8">
+                <div class="tab-bg absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm border border-slate-200/50"></div>
+                
+                <button onclick="switchTab('staff')" id="btnStaff" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-900 transition-colors duration-300">Institution</button>
+                <button onclick="switchTab('student')" id="btnStudent" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors duration-300">Student</button>
+            </div>
+
+            <form id="loginForm" class="flex flex-col gap-5">
+                <div id="formNotification" class="hidden p-4 rounded-xl text-sm font-semibold border flex items-center gap-3 transition-all duration-300"></div>
+                
+                <div class="smooth-transition">
+                    <label id="lblEmail" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Work Email</label>
+                    <input type="email" id="loginEmail" required placeholder="name@college.edu" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 text-sm font-medium text-slate-900 shadow-sm">
+                </div>
+                
+                <div class="smooth-transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <label id="lblPass" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Password</label>
+                        <button type="button" id="forgotBtn" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">Forgot password?</button>
+                    </div>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 text-sm font-medium text-slate-900 shadow-sm">
+                </div>
+                
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-blue-700 active:scale-[0.98] transition-all duration-300 mt-2 shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
+                    Sign In <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </form>
+
+            <p id="regText" class="text-center text-sm text-slate-500 mt-8 font-medium">Don't have a workspace? <a href="register.html" class="font-bold text-blue-600 hover:text-blue-800 transition-colors">Register institution</a></p>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'staff';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            const container = document.getElementById('tabContainer');
+            const btnStaff = document.getElementById('btnStaff');
+            const btnStudent = document.getElementById('btnStudent');
+            const form = document.getElementById('loginForm');
+            
+            // Add a tiny animation bump to the form
+            form.style.transform = 'scale(0.98)';
+            form.style.opacity = '0.8';
+            setTimeout(() => { form.style.transform = 'scale(1)'; form.style.opacity = '1'; }, 150);
+
+            if (mode === 'staff') {
+                container.className = "tab-staff relative flex p-1 bg-slate-100 rounded-xl mb-8";
+                btnStaff.className = "relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-900 transition-colors duration-300";
+                btnStudent.className = "relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors duration-300";
+                
+                document.getElementById('lblEmail').textContent = "Work Email";
+                document.getElementById('lblPass').textContent = "Password";
+                document.getElementById('loginPassword').type = "password";
+                document.getElementById('loginPassword').placeholder = "••••••••";
+                document.getElementById('forgotBtn').style.opacity = "1";
+                document.getElementById('forgotBtn').style.pointerEvents = "auto";
+                document.getElementById('regText').style.display = "block";
+            } else {
+                container.className = "tab-student relative flex p-1 bg-slate-100 rounded-xl mb-8";
+                btnStudent.className = "relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-900 transition-colors duration-300";
+                btnStaff.className = "relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors duration-300";
+                
+                document.getElementById('lblEmail').textContent = "Registered Student Email";
+                document.getElementById('lblPass').textContent = "Roll Number / Student ID";
+                document.getElementById('loginPassword').type = "text"; 
+                document.getElementById('loginPassword').placeholder = "e.g. BCA-2026-105";
+                document.getElementById('forgotBtn').style.opacity = "0";
+                document.getElementById('forgotBtn').style.pointerEvents = "none";
+                document.getElementById('regText').style.display = "none";
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const notif = document.getElementById('formNotification');
+            
+            btn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Authenticating...';
+            btn.disabled = true;
+            btn.classList.add('opacity-90');
+            notif.classList.add('hidden');
+
+            const payload = currentMode === 'staff' 
+                ? { email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value }
+                : { email: document.getElementById('loginEmail').value, studentIdNumber: document.getElementById('loginPassword').value };
+
+            const endpoint = currentMode === 'staff' ? '/api/auth/login' : '/api/auth/student-login';
+
+            try {
+                const res = await fetch(`${endpoint}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    const payloadObj = JSON.parse(atob(data.token.split('.')[1]));
+                    if (payloadObj.role === 'SuperAdmin') {
+                        notif.className = 'p-4 rounded-xl text-sm font-bold border bg-red-50 text-red-600 mb-4 flex items-center gap-3';
+                        notif.innerHTML = '<span>⚠️</span> Super Admins must use the HQ Portal.';
+                        btn.innerHTML = 'Sign In'; btn.disabled = false; btn.classList.remove('opacity-90');
+                        return;
+                    }
+                    localStorage.setItem('feehub_token', data.token);
+                    if (payloadObj.role === 'Student') {
+                        window.location.replace('student-dashboard.html');
+                    } else {
+                        window.location.replace('dashboard.html');
+                    }
+                } else {
+                    notif.className = 'p-4 rounded-xl text-sm font-bold border bg-red-50 text-red-600 mb-4 flex items-center gap-3';
+                    notif.innerHTML = `<span>❌</span> ${data.message || 'Invalid credentials.'}`;
+                }
+            } catch (err) {
+                notif.className = 'p-4 rounded-xl text-sm font-bold border bg-red-50 text-red-600 mb-4 flex items-center gap-3';
+                notif.innerHTML = '<span>🔌</span> Server connection error.';
+            } finally {
+                btn.innerHTML = 'Sign In <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>'; 
+                btn.disabled = false;
+                btn.classList.remove('opacity-90');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeeHub | Enterprise Cloud Fee Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: { '0%': { opacity: '0', transform: 'translateY(30px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .gradient-text { background: linear-gradient(135deg, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .feature-card:hover .feature-icon { transform: scale(1.1) rotate(-5deg); }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased overflow-x-hidden selection:bg-blue-200 selection:text-blue-900">
+
+    <nav class="fixed w-full top-0 z-50 glass-nav transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2 group cursor-pointer" onclick="window.scrollTo(0,0)">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black text-sm shadow-md group-hover:shadow-blue-500/30 transition-all">FH</div>
+                <span class="text-xl font-black text-slate-900 tracking-tight">FeeHub</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-bold text-slate-500">
+                <a href="#features" class="hover:text-blue-600 transition-colors">Platform Features</a>
+                <a href="#audience" class="hover:text-blue-600 transition-colors">Who it's for</a>
+                <a href="#security" class="hover:text-blue-600 transition-colors">Enterprise Security</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="login.html" class="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Client Login</a>
+                <a href="register.html" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all shadow-lg hover:shadow-slate-900/20 active:scale-95">Open Workspace</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative pt-48 pb-20 max-w-7xl mx-auto px-6 text-center flex flex-col items-center animate-fade-in-up z-10">
+        <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-400/20 rounded-full blur-[120px] -z-10 animate-pulse-slow"></div>
+        
+        <div class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-full text-xs font-bold tracking-wider uppercase mb-8 shadow-sm">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            FeeHub SaaS v2.0 is Live
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl font-black text-slate-900 tracking-tight leading-[1.1] max-w-4xl">
+            Campus Finance, <br/>
+            <span class="gradient-text">Perfectly Automated.</span>
+        </h1>
+        <p class="mt-8 text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed font-medium">
+            The ultimate multi-tenant cloud platform for educational institutions. Ditch the dusty ledger books, eliminate duplicate data entry, and stop revenue leakage today.
+        </p>
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <a href="register.html" class="bg-blue-600 text-white px-8 py-4 rounded-2xl text-lg font-bold hover:bg-blue-700 active:scale-95 transition-all duration-200 shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 w-full sm:w-auto">
+                Deploy Free Workspace <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+        </div>
+        
+        <div class="mt-20 w-full max-w-5xl mx-auto bg-white rounded-t-3xl border border-slate-200 border-b-0 shadow-2xl overflow-hidden relative group">
+            <div class="bg-slate-100 h-10 w-full flex items-center px-4 gap-2 border-b border-slate-200">
+                <div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-amber-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div>
+            </div>
+            <div class="p-4 bg-slate-50">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2000" alt="Dashboard Preview Graphic" class="w-full h-auto rounded-xl opacity-80 mix-blend-multiply filter grayscale contrast-125" style="height: 400px; object-fit: cover;">
+                <div class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <p class="text-2xl font-black text-slate-900 bg-white px-6 py-3 rounded-2xl shadow-xl">See it in action.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="py-24 bg-white border-y border-slate-200 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-3">Enterprise Capabilities</h2>
+                <h3 class="text-4xl font-black text-slate-900 tracking-tight">Everything a modern campus needs.</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm feature-icon transition-transform duration-300">📄</div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-3">Mathematical PDF Receipts</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Our completely customized jsPDF engine generates Fortune-500 quality receipts in milliseconds. Features dynamic component breakdowns and intelligent "Due Balance" warning logic.</p>
+                </div>
+                <div class="feature-card bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm feature-icon transition-transform duration-300">📧</div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-3">Automated HTML Emails</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Save thousands on SMS fees. Our integrated Nodemailer backend silently dispatches beautiful, mobile-responsive HTML email receipts directly to parents the second a payment clears.</p>
+                </div>
+                <div class="feature-card bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm feature-icon transition-transform duration-300">🛡️</div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-3">Smart Guardrail Logic</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Staff can never overcharge a student. The backend mathematically cross-references past transactions to dynamically cap input fields, preventing critical accounting errors.</p>
+                </div>
+                <div class="feature-card bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm feature-icon transition-transform duration-300">⚡</div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-3">Bulk CSV Data Routing</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Onboard 1,000 students in 2 seconds. The smart CSV parser reads your spreadsheet, validates duplicate Roll Numbers, and auto-assigns massive fee master configurations instantly.</p>
+                </div>
+                <div class="feature-card bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm feature-icon transition-transform duration-300">👥</div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-3">Strict RBAC Control</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">Institution Admins command the workspace, while Cashiers operate in a sandboxed environment. Sub-account access can be instantly revoked to protect data integrity.</p>
+                </div>
+                <div class="feature-card bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:bg-white transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm feature-icon transition-transform duration-300">📊</div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-3">Real-Time Data Vis</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">The dashboard utilizes Chart.js to render beautiful, live visual representations of your institution's financial health, cohort enrollment size, and massive debt deficits.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="audience" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-3">Use Cases</h2>
+                    <h3 class="text-4xl md:text-5xl font-black text-white tracking-tight mb-6">Built for scale. Designed for speed.</h3>
+                    <p class="text-slate-400 text-lg leading-relaxed mb-8">
+                        FeeHub’s flexible dynamic fee structure engine was engineered specifically because different institutions have radically different billing needs.
+                    </p>
+                    <ul class="space-y-6">
+                        <li class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center flex-shrink-0 border border-indigo-500/30">🎓</div>
+                            <div>
+                                <strong class="text-white text-lg block mb-1">Colleges & Universities</strong>
+                                <span class="text-slate-400 text-sm">Manage highly complex semester-based components (Tuition, Library, Lab, Hostel) with varying fine structures.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 border border-emerald-500/30">🏫</div>
+                            <div>
+                                <strong class="text-white text-lg block mb-1">K-12 Schools</strong>
+                                <span class="text-slate-400 text-sm">Easily configure annual batches, track partial parent payments, and auto-identify overdue balances at term-end.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/30">📚</div>
+                            <div>
+                                <strong class="text-white text-lg block mb-1">Tuition Centers & Academies</strong>
+                                <span class="text-slate-400 text-sm">Simple, flat-fee structures that let you onboard a student and process a cash payment in exactly 12 seconds.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800/50 backdrop-blur-xl border border-slate-700 p-8 rounded-3xl shadow-2xl">
+                    <div class="mb-6 flex justify-between items-center border-b border-slate-700 pb-4">
+                        <span class="text-white font-bold">Transaction Preview</span>
+                        <span class="text-xs font-mono text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded border border-emerald-400/20">LIVE DATA</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold">BB</div>
+                                <div><p class="text-sm font-bold text-white">Bhavani B.</p><p class="text-xs text-slate-400">MBA (2026-2028)</p></div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-emerald-400 font-bold text-sm">+ ₹77,000</p>
+                                <p class="text-xs text-slate-500 font-mono">REC-A9F32</p>
+                            </div>
+                        </div>
+                         <div class="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold">AK</div>
+                                <div><p class="text-sm font-bold text-white">Arjun K.</p><p class="text-xs text-slate-400">BCA (2025-2028)</p></div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-emerald-400 font-bold text-sm">+ ₹15,000</p>
+                                <p class="text-xs text-slate-500 font-mono">REC-B71X9</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="security" class="py-24 bg-slate-50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-6">Military-Grade Multi-Tenancy</h2>
+            <p class="text-slate-600 text-lg leading-relaxed mb-12">
+                Your institution's financial data is sacrosanct. FeeHub employs strict architectural separation at the database level. Every single read, write, and API call is mathematically bound to your specific cryptographic JWT `institutionId`. Your data cannot leak. Period.
+            </p>
+            <a href="register.html" class="inline-flex bg-slate-900 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-slate-800 active:scale-95 transition-all shadow-xl">
+                Secure your institution today
+            </a>
+        </div>
+    </section>
+
+    <footer class="bg-white border-t border-slate-200 py-12 text-center text-slate-500">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col items-center">
+            <div class="flex items-center gap-2 mb-6 grayscale opacity-60">
+                <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-black text-sm">FH</div>
+                <span class="text-xl font-black text-slate-900 tracking-tight">FeeHub</span>
+            </div>
+            <p class="text-sm border-t border-slate-100 pt-8 w-full max-w-md mx-auto">
+                © 2026 FeeHub SaaS. Engineered by Bhapee Studios.<br>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

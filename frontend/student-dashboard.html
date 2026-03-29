@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal | FeeHub</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        (function() {
+            var token = localStorage.getItem('feehub_token');
+            if (!token) { window.location.replace('login.html'); return; }
+            try {
+                var payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.exp * 1000 < Date.now()) { window.location.replace('login.html'); return; }
+                if (payload.role !== 'Student') { window.location.replace('dashboard.html'); return; }
+            } catch(e) { window.location.replace('login.html'); return; }
+        })();
+    </script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, animation: { 'fade-in': 'fadeIn 0.4s ease-out forwards', 'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards' }, keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, slideUp: { '0%': { opacity: '0', transform: 'translateY(30px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } } } } }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.8); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .glass-card:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-blue-200 opacity-0 transition-opacity duration-500" id="APP">
+
+<div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-400/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
+
+<div class="relative z-10 min-h-screen flex flex-col max-w-6xl mx-auto p-4 sm:p-8">
+    
+    
+    <header class="flex flex-col sm:flex-row justify-between sm:items-end gap-6 mb-12 animate-fade-in border-b border-slate-200 pb-6">
+        <div class="flex items-center gap-5">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg shadow-blue-500/20 flex items-center justify-center text-white font-black text-2xl" id="avatarBox">FH</div>
+            <div>
+                <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1" id="instNameDisplay">Loading Institution...</p>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight" id="studentNameDisplay">Loading...</h1>
+                <p class="text-sm font-semibold text-slate-500 mt-1" id="studentIdDisplay">Please wait...</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold border border-slate-200" id="courseBatchDisplay">Loading / Course</span>
+            <button onclick="logout()" class="bg-white border border-slate-200 text-red-500 hover:bg-red-50 hover:border-red-100 font-bold px-5 py-2 rounded-xl text-sm transition-colors shadow-sm">Sign Out</button>
+        </div>
+    </header>
+
+    
+    <div id="errorBox" class="hidden bg-red-50 border border-red-200 text-red-700 p-6 rounded-2xl text-center max-w-md mx-auto animate-slide-up mt-12">
+        <h3 class="font-bold text-lg mb-2">Session Expired</h3>
+        <p class="text-sm mb-4" id="errorMsgText">Please log in again to view your dashboard.</p>
+        <button onclick="logout()" class="bg-red-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-red-700">Return to Login</button>
+    </div>
+
+    <div id="mainContent" class="hidden">
+        
+        <h2 class="text-xl font-bold text-slate-900 mb-6 animate-fade-in">Financial Overview</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-card rounded-3xl p-6 border-t-4 border-t-slate-400 animate-slide-up" style="animation-delay: 50ms;">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Total Program Fee</p>
+                <h3 class="text-4xl font-black text-slate-900" id="statTotalFee">₹0</h3>
+            </div>
+            <div class="glass-card rounded-3xl p-6 border-t-4 border-t-emerald-500 shadow-sm shadow-emerald-500/10 animate-slide-up" style="animation-delay: 100ms;">
+                <p class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">Total Paid Amount</p>
+                <h3 class="text-4xl font-black text-emerald-600" id="statPaid">₹0</h3>
+            </div>
+            <div class="glass-card rounded-3xl p-6 border-t-4 border-t-red-500 shadow-md shadow-red-500/10 animate-slide-up" style="animation-delay: 150ms;" id="dueCard">
+                <p class="text-xs font-bold text-red-500 uppercase tracking-widest mb-2">Pending Due Balance</p>
+                <h3 class="text-4xl font-black text-red-500" id="statDue">₹0</h3>
+            </div>
+        </div>
+
+        
+        <div class="flex justify-between items-end mb-6 animate-fade-in">
+            <h2 class="text-xl font-bold text-slate-900">Payment History</h2>
+            <span class="text-xs font-bold text-slate-500 bg-slate-200 px-3 py-1 rounded-full" id="historyCount">0 Transactions</span>
+        </div>
+
+        <div class="glass-card rounded-3xl overflow-hidden animate-slide-up shadow-sm border border-slate-200" style="animation-delay: 200ms;">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Date</th>
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Receipt No</th>
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Mode</th>
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Amount</th>
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentHistoryBody">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="mt-16 py-8 text-center text-xs font-semibold text-slate-400 animate-fade-in" style="animation-delay: 300ms;">
+        <p>Powered by FeeHub SECURE Engine</p>
+    </footer>
+</div>
+
+<script>
+const token = localStorage.getItem('feehub_token');
+if (!token) window.location.replace('login.html');
+
+let STUDENT_DATA = null;
+let PAYMENTS = [];
+let INSTITUTION_NAME = "FeeHub";
+
+const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+const ini = n => (n || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+function logout() {
+    localStorage.removeItem('feehub_token');
+    window.location.replace('login.html');
+}
+
+
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted && !localStorage.getItem('feehub_token')) {
+        window.location.replace('login.html');
+    }
+});
+
+async function loadData() {
+    try {
+        const res = await fetch('/api/student-portal', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await res.json();
+        
+        if (res.status === 401 || res.status === 403) {
+            logout(); return;
+        }
+
+        if (result.success) {
+            STUDENT_DATA = result.data.student;
+            PAYMENTS = result.data.payments;
+            INSTITUTION_NAME = result.data.institutionName;
+            renderDashboard();
+        } else {
+            showError(result.message);
+        }
+    } catch (error) {
+        showError("Unable to connect to the server.");
+    }
+    document.getElementById('APP').style.opacity = '1';
+}
+
+function showError(msg) {
+    document.getElementById('errorBox').classList.remove('hidden');
+    document.getElementById('errorMsgText').textContent = msg;
+}
+
+function renderDashboard() {
+    document.getElementById('mainContent').classList.remove('hidden');
+    
+    
+    document.getElementById('instNameDisplay').textContent = INSTITUTION_NAME;
+    document.getElementById('studentNameDisplay').textContent = STUDENT_DATA.name;
+    document.getElementById('studentIdDisplay').textContent = `Roll No: ${STUDENT_DATA.studentIdNumber || 'N/A'}`;
+    document.getElementById('avatarBox').textContent = ini(STUDENT_DATA.name);
+    document.getElementById('courseBatchDisplay').textContent = `${STUDENT_DATA.course} • ${STUDENT_DATA.batch}`;
+    
+    
+    const due = Math.max(0, STUDENT_DATA.totalFees - STUDENT_DATA.paid);
+    document.getElementById('statTotalFee').textContent = fmt(STUDENT_DATA.totalFees);
+    document.getElementById('statPaid').textContent = fmt(STUDENT_DATA.paid);
+    document.getElementById('statDue').textContent = fmt(due);
+    
+    const dueCard = document.getElementById('dueCard');
+    if (due <= 0 && STUDENT_DATA.totalFees > 0) {
+        dueCard.className = "glass-card rounded-3xl p-6 border-t-4 border-t-emerald-500 bg-emerald-50 shadow-sm animate-slide-up";
+        dueCard.innerHTML = `<p class="text-xs font-bold text-emerald-700 uppercase tracking-widest mb-2">Pending Due Balance</p><h3 class="text-2xl font-black text-emerald-600 mt-3 flex items-center gap-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Fully Cleared</h3>`;
+    }
+
+    
+    document.getElementById('historyCount').textContent = `${PAYMENTS.length} Transactions`;
+    const tbody = document.getElementById('paymentHistoryBody');
+    
+    if (PAYMENTS.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-slate-400 font-bold bg-white/50 border border-dashed border-slate-200">No payment history found based on your student ID.</td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = PAYMENTS.map((p, i) => {
+        const date = new Date(p.paymentDate || p.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        const recId = p.receiptNumber || `REC-${p._id.slice(-6).toUpperCase()}`;
+        return `
+        <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0 group">
+            <td class="py-5 px-6 font-semibold text-slate-700">${date}</td>
+            <td class="py-5 px-6 font-mono text-sm text-slate-500">${recId}</td>
+            <td class="py-5 px-6"><span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100 uppercase tracking-wider">${p.paymentMethod || p.method || 'CASH'}</span></td>
+            <td class="py-5 px-6 font-bold text-emerald-600 text-lg">+ ${fmt(p.amount)}</td>
+            <td class="py-5 px-6 text-right">
+                <button onclick="downloadReceipt('${p._id}')" class="bg-white border border-slate-200 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-blue-50 hover:border-blue-200 transition-colors opacity-80 group-hover:opacity-100">
+                    PDF Receipt
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+
+function downloadReceipt(id) {
+    const p = PAYMENTS.find(x => x._id === id); if (!p) return alert("Receipt data missing");
+    
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    const colorBg = [244, 246, 249]; const colorHeader = [44, 62, 80]; const colorText = [119, 119, 119]; const colorDarkText = [51, 51, 51]; const colorDueBg = [255, 230, 230]; const colorDueText = [192, 57, 43]; const colorNoteBg = [241, 243, 245]; const colorNoteBorder = [52, 152, 219];
+    
+    doc.setFillColor(...colorBg); doc.rect(0, 0, 210, 297, 'F');
+    doc.setFillColor(255, 255, 255); doc.roundedRect(15, 20, 180, 250, 3, 3, 'F'); doc.setDrawColor(230, 230, 230); doc.roundedRect(15, 20, 180, 250, 3, 3, 'S');
+
+    doc.setTextColor(...colorHeader); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text(INSTITUTION_NAME, 25, 35);
+    doc.setTextColor(...colorText); doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("Official Payment Receipt", 25, 42);
+    doc.setTextColor(...colorHeader); doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text("RECEIPT", 185, 35, { align: "right" });
+    
+    doc.setDrawColor(238, 238, 238); doc.setLineWidth(0.5); doc.line(25, 48, 185, 48);
+
+    doc.setTextColor(...colorDarkText); doc.setFontSize(10); 
+    doc.setFont("helvetica", "bold"); doc.text("Name:", 25, 58); doc.setFont("helvetica", "normal"); doc.text(STUDENT_DATA.name, 40, 58);
+    doc.setFont("helvetica", "bold"); doc.text("Roll No:", 25, 65); doc.setFont("helvetica", "normal"); doc.text(STUDENT_DATA.studentIdNumber || 'N/A', 43, 65);
+    doc.setFont("helvetica", "bold"); doc.text("Course:", 25, 72); doc.setFont("helvetica", "normal"); doc.text(`${STUDENT_DATA.course} (${STUDENT_DATA.batch})`, 42, 72);
+    
+    const recId = p.receiptNumber || `REC-${p._id.slice(-6).toUpperCase()}`;
+    const dateStr = new Date(p.paymentDate || p.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    
+    doc.setFont("helvetica", "bold"); doc.text("Receipt No:", 130, 58); doc.setFont("helvetica", "normal"); doc.text(recId, 155, 58);
+    doc.setFont("helvetica", "bold"); doc.text("Date:", 130, 65); doc.setFont("helvetica", "normal"); doc.text(dateStr, 142, 65);
+    doc.setFont("helvetica", "bold"); doc.text("Mode:", 130, 72); doc.setFont("helvetica", "normal"); doc.text(p.paymentMethod || p.method || 'Cash', 143, 72);
+
+    let tableBody = p.components && p.components.length > 0 ? p.components.map(c => [c.name, fmt(c.amount)]) : [['Academic Fee Payment', fmt(p.amount - (p.fine||0))]];
+    if (p.fine && p.fine > 0) tableBody.push(['Late Fee / Fine', fmt(p.fine)]);
+
+    doc.autoTable({ startY: 82, head: [['Fee Description', 'Amount (Rs.)']], body: tableBody, theme: 'plain', headStyles: { fillColor: colorHeader, textColor: [255, 255, 255], fontStyle: 'bold' }, styles: { fontSize: 10, cellPadding: 6, textColor: colorDarkText }, columnStyles: { 0: { cellWidth: 100 }, 1: { halign: 'right' } }, margin: { left: 25, right: 25 }, didDrawCell: function(data) { if (data.row.section === 'body') { doc.setDrawColor(221, 221, 221); doc.line(data.cell.x, data.cell.y + data.cell.height, data.cell.x + data.cell.width, data.cell.y + data.cell.height); } } });
+
+    let finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.setTextColor(...colorHeader); doc.text(`Total Paid: ${fmt(p.amount)}`, 185, finalY, { align: "right" });
+    finalY += 15;
+
+    if (STUDENT_DATA.totalFees > 0) {
+        const dueBalance = Math.max(0, STUDENT_DATA.totalFees - STUDENT_DATA.paid);
+        if (dueBalance > 0) {
+            doc.setFillColor(...colorDueBg); doc.roundedRect(25, finalY, 160, 12, 2, 2, 'F'); doc.setFontSize(10); doc.setTextColor(...colorDueText); doc.setFont("helvetica", "bold"); doc.text(`Current Due Balance: ${fmt(dueBalance)}`, 30, finalY + 8);
+            finalY += 18;
+            doc.setFillColor(...colorNoteBg); doc.roundedRect(25, finalY, 160, 14, 2, 2, 'F'); doc.setFillColor(...colorNoteBorder); doc.rect(25, finalY, 3, 14, 'F'); 
+            doc.setFontSize(9); doc.setTextColor(85, 85, 85); doc.setFont("helvetica", "normal"); doc.text("Note: The above due balance does not include any applicable fines or penalties.", 32, finalY + 8.5);
+            finalY += 25;
+        } else {
+            doc.setFillColor(230, 255, 235); doc.roundedRect(25, finalY, 160, 12, 2, 2, 'F'); doc.setFontSize(10); doc.setTextColor(39, 174, 96); doc.setFont("helvetica", "bold"); doc.text(`Account Fully Cleared (No Dues Remaining)`, 30, finalY + 8);
+            finalY += 25;
+        }
+    } else { finalY += 10; }
+
+    doc.setFontSize(10); doc.setTextColor(85, 85, 85); doc.setFont("helvetica", "normal"); doc.text("Thank you for your payment", 105, finalY, { align: "center" });
+    doc.setFontSize(8); doc.text("This is a computer-generated receipt", 105, finalY + 5, { align: "center" });
+    
+    finalY += 20; doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.5); doc.line(135, finalY, 185, finalY);
+    doc.setFontSize(9); doc.text("Authorized Signature", 160, finalY + 5, { align: "center" });
+    doc.save(`${recId}_Fee_Receipt.pdf`);
+}
+
+loadData();
+</script>
+</body>
+</html>

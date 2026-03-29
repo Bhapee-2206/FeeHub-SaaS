@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HQ Control | FeeHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        (function() {
+            var token = localStorage.getItem('feehub_token');
+            if (!token) { window.location.replace('hq-login.html'); return; }
+            try {
+                var payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.exp * 1000 < Date.now() || payload.role !== 'SuperAdmin') {
+                    window.location.replace('hq-login.html'); return;
+                }
+            } catch(e) { window.location.replace('hq-login.html'); return; }
+        })();
+    </script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, animation: { 'fade-in': 'fadeIn 0.4s ease-out forwards', 'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }, keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } } } } }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .bg-grid-pattern {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: white;
+            border-left: 4px solid #4f46e5;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 16px 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideUp 0.3s ease-out forwards;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased selection:bg-indigo-200 min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <div class="fixed inset-0 bg-grid-pattern z-0 opacity-30 pointer-events-none"></div>
+    <div
+        class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none z-0">
+    </div>
+
+    <header
+        class="h-20 bg-white/80 backdrop-blur-lg border-b border-slate-200/50 flex items-center justify-between px-6 sm:px-12 z-20 sticky top-0 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div
+                class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-900/20">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-black text-slate-900 tracking-tight leading-none">System Director</h1>
+                <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-0.5">Global Override Active
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <span class="hidden sm:block text-sm font-bold text-slate-500" id="adminNameDisplay">Director</span>
+            <button onclick="logout()"
+                class="bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                Sign Out <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-7xl mx-auto px-6 sm:px-12 py-10 z-10 flex flex-col">
+
+        <div class="mb-10 flex flex-col sm:flex-row justify-between sm:items-end gap-4 animate-fade-in">
+            <div>
+                <h2 class="text-4xl font-black text-slate-900 tracking-tight">Platform Command</h2>
+                <p class="text-sm text-slate-500 mt-2 font-medium">Monitor all tenants and global SaaS metrics.</p>
+            </div>
+            <button onclick="openProvisionModal()"
+                class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Provision New Client
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 border-t-4 border-t-indigo-500 animate-slide-up"
+                style="animation-delay: 50ms;">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Active Tenants</p>
+                <h3 class="text-4xl font-black text-slate-900" id="statTenants">0</h3>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 border-t-4 border-t-emerald-500 animate-slide-up"
+                style="animation-delay: 100ms;">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Global Processed Volume</p>
+                <h3 class="text-4xl font-black text-slate-900 truncate" id="statVolume">₹0</h3>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 border-t-4 border-t-blue-500 animate-slide-up"
+                style="animation-delay: 150ms;">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Platform Users</p>
+                <h3 class="text-4xl font-black text-slate-900" id="statUsers">0</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col animate-slide-up"
+            style="animation-delay: 200ms;">
+            <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="font-bold text-lg text-slate-800">Deployed Institutions</h3>
+                <div class="relative">
+                    <input type="text" id="searchClient" oninput="filterClients(this.value)"
+                        placeholder="Search domain or ID..."
+                        class="pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-indigo-500 bg-white shadow-sm w-64 transition-colors">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse min-w-[900px]">
+                    <thead>
+                        <tr class="bg-white border-b border-slate-100">
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Institution
+                                Details</th>
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Admin
+                                Contact</th>
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-wider">System
+                                Status</th>
+                            <th class="py-4 px-6 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">
+                                Director Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tenantTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="OV" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div
+            class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-slide-up transform scale-95 transition-all">
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900">Provision New Tenant</h3>
+                    <p class="text-xs font-medium text-slate-500 mt-1">Deploy an isolated workspace environment.</p>
+                </div>
+                <button onclick="closeM()"
+                    class="text-slate-400 hover:text-slate-800 bg-white hover:bg-slate-200 border border-slate-200 w-8 h-8 rounded-full flex items-center justify-center transition-colors">✕</button>
+            </div>
+            <div class="p-8">
+                <form id="provisionForm" onsubmit="handleProvision(event)" class="space-y-5">
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Institution
+                            Name</label>
+                        <input type="text" id="instName" required placeholder="e.g. Harvard University"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Root Admin
+                            Name</label>
+                        <input type="text" id="adminName" required placeholder="e.g. Dean John Doe"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Admin
+                            Login Email</label>
+                        <input type="email" id="adminEmail" required placeholder="admin@harvard.edu"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Initial
+                            Master Password</label>
+                        <input type="text" id="adminPass" required placeholder="Generate a secure password"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm font-semibold">
+                    </div>
+
+                    <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mt-6 flex items-start gap-3">
+                        <svg class="w-5 h-5 text-indigo-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-xs text-indigo-800 font-medium leading-relaxed">Deploying a tenant automatically
+                            provisions a new isolated database schema and creates the Root Administrator account.</p>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-100 flex justify-end gap-3">
+                        <button type="button" onclick="closeM()"
+                            class="px-6 py-3 rounded-xl font-bold bg-white border border-slate-200 text-slate-600 text-sm hover:bg-slate-50 transition-colors">Cancel</button>
+                        <button type="submit" id="provBtn"
+                            class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl shadow-md shadow-indigo-600/20 text-sm hover:bg-indigo-700 transition-all active:scale-95">Deploy
+                            Workspace</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        // 🔒 SECURITY CHECK
+        const token = localStorage.getItem('feehub_token');
+        if (!token) window.location.replace('hq-login.html');
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.role !== 'SuperAdmin') throw new Error("Unauthorized");
+        } catch (e) { window.location.replace('hq-login.html'); }
+
+        let INSTITUTIONS = [];
+
+        function logout() { localStorage.removeItem('feehub_token'); window.location.replace('hq-login.html'); }
+        function closeM() { document.getElementById('OV').classList.replace('flex', 'hidden'); }
+        function openProvisionModal() {
+            document.getElementById('provisionForm').reset();
+            document.getElementById('OV').classList.replace('hidden', 'flex');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast border-l-4 bg-white rounded-xl shadow-lg px-4 py-3 flex items-center gap-3 ${type === 'error' ? 'border-rose-500 text-rose-700' : 'border-indigo-500 text-indigo-700'}`;
+            toast.innerHTML = `<span class="font-bold text-sm">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+
+        const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+
+        // Fetch Global Data from HQ Route
+        async function fetchGlobalData() {
+            try {
+                // Fetch from the specific HQ route we will create in the backend
+                const res = await fetch('/api/hq/dashboard', { headers: { 'Authorization': `Bearer ${token}` } });
+                const result = await res.json();
+
+                if (res.status === 401 || res.status === 403) return logout();
+
+                if (result.success) {
+                    INSTITUTIONS = result.data.institutions;
+
+                    document.getElementById('statTenants').textContent = result.data.totalInstitutions;
+                    document.getElementById('statVolume').textContent = fmt(result.data.totalPlatformRevenue);
+                    document.getElementById('statUsers').textContent = result.data.totalPlatformUsers;
+
+                    renderTable(INSTITUTIONS);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (e) {
+                showToast("Connection to Server failed.", "error");
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tenantTableBody');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-slate-400 font-bold bg-slate-50/50">No external clients found on platform.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(inst => {
+                // Hide the invisible HQ account from the list
+                if (inst.email === 'hq@feehub.com') return '';
+
+                const isSuspended = inst.isActive === false;
+                const statusBadge = isSuspended
+                    ? `<span class="bg-rose-50 text-rose-600 border border-rose-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">Suspended</span>`
+                    : `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">Operational</span>`;
+
+                const toggleBtn = isSuspended
+                    ? `<button onclick="toggleStatus('${inst._id}', true)" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors border border-emerald-100 w-24">Reactivate</button>`
+                    : `<button onclick="toggleStatus('${inst._id}', false)" class="bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors border border-amber-100 w-24">Suspend</button>`;
+
+                return `
+                <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition-colors group">
+                    <td class="py-5 px-6">
+                        <p class="font-bold text-slate-900 text-sm">${inst.name}</p>
+                        <p class="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-widest">${inst._id}</p>
+                    </td>
+                    <td class="py-5 px-6">
+                        <p class="text-sm font-semibold text-slate-700">${inst.adminName || 'Unknown Admin'}</p>
+                        <p class="text-xs text-slate-500 font-medium">${inst.email}</p>
+                    </td>
+                    <td class="py-5 px-6">${statusBadge}</td>
+                    <td class="py-5 px-6 text-right flex justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                        ${toggleBtn}
+                        <button onclick="deleteTenant('${inst._id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors border border-rose-100 shadow-sm flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterClients(term) {
+            const lower = term.toLowerCase();
+            const filtered = INSTITUTIONS.filter(i => i.name.toLowerCase().includes(lower) || i._id.toLowerCase().includes(lower) || i.email.toLowerCase().includes(lower));
+            renderTable(filtered);
+        }
+
+        // Deploy New Client (Hooks into our existing Register Route!)
+        async function handleProvision(e) {
+            e.preventDefault();
+            const btn = document.getElementById('provBtn');
+            btn.innerHTML = "Deploying..."; btn.disabled = true;
+
+            const payload = {
+                institutionName: document.getElementById('instName').value,
+                adminName: document.getElementById('adminName').value,
+                email: document.getElementById('adminEmail').value,
+                password: document.getElementById('adminPass').value
+            };
+
+            try {
+                // We securely use the auth/register route we already built
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast("Tenant Successfully Deployed!");
+                    closeM();
+                    fetchGlobalData(); // Refresh the table
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (err) {
+                showToast('Deployment failed due to network error.', 'error');
+            } finally {
+                btn.innerHTML = "Deploy Workspace"; btn.disabled = false;
+            }
+        }
+
+        // Toggle Suspension
+        async function toggleStatus(id, makeActive) {
+            const action = makeActive ? 'reactivate' : 'suspend';
+            if (!confirm(`Are you sure you want to ${action} this institution? All staff and students will be locked out.`)) return;
+
+            try {
+                const res = await fetch(`/api/hq/institutions/${id}/toggle`, {
+                    method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isActive: makeActive })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`Tenant has been ${makeActive ? 'reactivated' : 'suspended'}.`);
+                    fetchGlobalData();
+                } else showToast(data.message, 'error');
+            } catch (e) { showToast('Server Error', 'error'); }
+        }
+
+        // Nuclear Delete
+        async function deleteTenant(id) {
+            const confirm1 = confirm("WARNING: This will permanently delete the Institution, all their Staff, Students, Courses, and Payment History. Proceed?");
+            if (!confirm1) return;
+
+            const typed = prompt("To confirm, type the word 'DELETE' below:");
+            if (typed !== "DELETE") return showToast("Deletion aborted.", "error");
+
+            try {
+                const res = await fetch(`/api/hq/institutions/${id}`, {
+                    method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast("Tenant completely erased from the server.");
+                    fetchGlobalData();
+                } else showToast(data.message, 'error');
+            } catch (e) { showToast('Server Error', 'error'); }
+        }
+
+        // Boot
+        fetchGlobalData();
+    </script>
+</body>
+
+</html>
