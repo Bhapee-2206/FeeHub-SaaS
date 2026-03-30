@@ -123,7 +123,9 @@ const forgotPassword = async (req, res, next) => {
         await user.save({ validateBeforeSave: false });
 
         // Create the reset URL pointing to your frontend
-        const resetUrl = `http://localhost:5000/reset-password.html?token=${resetToken}`;
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const host = req.headers['x-forwarded-host'] || req.get('host');
+        const resetUrl = `${protocol}://${host}/reset-password.html?token=${resetToken}`;
 
         // Configure Nodemailer to use your Gmail
         const transporter = nodemailer.createTransport({
@@ -135,15 +137,44 @@ const forgotPassword = async (req, res, next) => {
         });
 
         const message = {
-            from: process.env.EMAIL_USER, // ✅ FIXED: Removed the broken ${} syntax
+            from: `"FeeHub" <${process.env.EMAIL_USER}>`,
             to: user.email,
-            subject: 'FeeHub Password Reset Request',
+            subject: 'Reset Your FeeHub Password',
             html: `
-                <h3>FeeHub Password Reset</h3>
-                <p>You requested a password reset. Please click the link below to set a new password:</p>
-                <a href="${resetUrl}" style="display:inline-block; padding:10px 20px; background:#71C9CE; color:#1E293B; text-decoration:none; border-radius:5px; font-weight:bold;">Reset Password</a>
-                <p>This link will expire in 10 minutes.</p>
-                <p>If you did not request this, please ignore this email.</p>
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:40px 20px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
+  <!-- Header -->
+  <tr><td style="background:linear-gradient(135deg,#1e293b,#0f172a);padding:32px 36px;text-align:center;">
+    <div style="display:inline-block;background:#2563eb;width:40px;height:40px;border-radius:10px;line-height:40px;color:#fff;font-weight:900;font-size:14px;letter-spacing:-0.5px;">FH</div>
+    <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:16px 0 0;letter-spacing:-0.5px;">Password Reset Request</h1>
+  </td></tr>
+  <!-- Body -->
+  <tr><td style="padding:36px;">
+    <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 8px;">Hi <strong>${user.name || 'there'}</strong>,</p>
+    <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 28px;">We received a request to reset the password for your FeeHub account. Click the button below to choose a new password:</p>
+    <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:4px 0 28px;">
+      <a href="${resetUrl}" style="display:inline-block;padding:14px 36px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:12px;font-weight:700;font-size:15px;letter-spacing:-0.3px;box-shadow:0 4px 14px rgba(37,99,235,0.35);">Reset Password</a>
+    </td></tr></table>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+      <p style="color:#64748b;font-size:13px;line-height:1.6;margin:0;">
+        <strong style="color:#475569;">⏱ Expires in 10 minutes</strong><br>
+        If you didn't request this reset, you can safely ignore this email. Your password won't change.
+      </p>
+    </div>
+    <p style="color:#94a3b8;font-size:12px;line-height:1.6;margin:0;">If the button doesn't work, copy and paste this link into your browser:<br>
+    <a href="${resetUrl}" style="color:#2563eb;word-break:break-all;font-size:12px;">${resetUrl}</a></p>
+  </td></tr>
+  <!-- Footer -->
+  <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:20px 36px;text-align:center;">
+    <p style="color:#94a3b8;font-size:11px;margin:0;">© ${new Date().getFullYear()} FeeHub SaaS &middot; Engineered by Bhapee Studios</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>
             `
         };
 

@@ -33,7 +33,9 @@ const userSchema = new mongoose.Schema({
     studentIdNumber: {
         type: String,
         default: null
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
 }, {
     timestamps: true
 });
