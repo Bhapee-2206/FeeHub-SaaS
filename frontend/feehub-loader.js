@@ -95,10 +95,11 @@
 
   // ── Status messages cycle ──
   const statusMessages = [
-    'Connecting to server',
     'Authenticating session',
-    'Loading workspace',
-    'Preparing data',
+    'Connecting to server',
+    'Loading your workspace',
+    'Fetching fee records',
+    'Syncing student data',
     'Almost ready'
   ];
   let msgIndex = 0;
@@ -157,11 +158,20 @@
     });
   }
 
-  // Hide when everything is loaded (images, fonts, scripts)
-  // This is the real trigger — great for Railway cold starts
+  // Expose globally so specific pages (like dashboard) can call it manually
+  // after their own data has finished loading
+  window.feehubLoaderHide = hideLoader;
+
+  // Default fallback: hide when window fully loads (images, fonts, scripts)
+  // Dashboard page overrides this by calling feehubLoaderHide() itself
   window.addEventListener('load', function () {
-    // Small grace period to let JS on the page initialize
-    setTimeout(hideLoader, 300);
+    // Only auto-hide after a grace period if the page hasn't manually hidden it
+    setTimeout(function () {
+      const loader = document.getElementById('feehub-page-loader');
+      if (loader && !loader.classList.contains('loader-hidden')) {
+        hideLoader();
+      }
+    }, 600);
   });
 
   // Fallback: never show loader for more than 12 seconds
