@@ -1,13 +1,8 @@
-/* ═══════════════════════════════════════════════════════════════
-   FeeHub SaaS — Smart Page Loader Script
-   Inject this in <head> of every page. Works standalone.
-   ═══════════════════════════════════════════════════════════════ */
-
 (function () {
   'use strict';
 
-  // ── 0. IMMEDIATE ANTI-FLASH Patcher ──
-  // Execute instantly in `<head>` to prevent any white/grey flash from body rendering
+  // This style is injected before the page renders anything visible.
+  // It forces the background dark so users never see the browser's default white flash.
   const antiFlashStyle = document.createElement('style');
   antiFlashStyle.id = 'feehub-anti-flash';
   antiFlashStyle.innerHTML = `
@@ -20,7 +15,6 @@
   `;
   document.documentElement.appendChild(antiFlashStyle);
 
-  // ── Inject loader HTML immediately (before DOM is ready) ──
   const loaderHTML = `
   <div id="feehub-page-loader">
     <div class="loader-bg-mesh"></div>
@@ -72,14 +66,12 @@
     </div>
   </div>`;
 
-  // Insert loader as first element in body (or create a temp container)
   function injectLoader() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = loaderHTML.trim();
     const loaderEl = wrapper.firstChild;
     document.body.insertBefore(loaderEl, document.body.firstChild);
 
-    // Spawn particles
     const particlesInner = document.getElementById('loader-particles-inner');
     if (particlesInner) {
       for (let i = 0; i < 20; i++) {
@@ -93,7 +85,6 @@
     }
   }
 
-  // ── Status messages cycle ──
   const statusMessages = [
     'Authenticating session',
     'Connecting to server',
@@ -119,35 +110,28 @@
     }, 1800);
   }
 
-  // ── Hide loader smoothly ──
   function hideLoader() {
     if (statusInterval) clearInterval(statusInterval);
     const loader = document.getElementById('feehub-page-loader');
     const progressBar = document.getElementById('loader-progress-bar');
     if (!loader) return;
 
-    // Complete the progress bar first
     if (progressBar) {
       progressBar.classList.add('complete');
     }
 
-    // Then fade out after a short delay
     setTimeout(function () {
       loader.classList.add('loader-hidden');
 
-      // Reveal the body content so it correctly fades in
       const antiFlash = document.getElementById('feehub-anti-flash');
       if (antiFlash) antiFlash.remove();
 
-      // Remove from DOM after transition
       setTimeout(function () {
         if (loader.parentNode) loader.parentNode.removeChild(loader);
       }, 700);
     }, 400);
   }
 
-  // ── Boot ──
-  // Inject as early as possible
   if (document.body) {
     injectLoader();
     startStatusCycle();
@@ -158,14 +142,11 @@
     });
   }
 
-  // Expose globally so specific pages (like dashboard) can call it manually
-  // after their own data has finished loading
+  // Expose this so pages like dashboard.html can trigger the hide manually
+  // once their own data and UI is fully ready, instead of relying on window.load
   window.feehubLoaderHide = hideLoader;
 
-  // Default fallback: hide when window fully loads (images, fonts, scripts)
-  // Dashboard page overrides this by calling feehubLoaderHide() itself
   window.addEventListener('load', function () {
-    // Only auto-hide after a grace period if the page hasn't manually hidden it
     setTimeout(function () {
       const loader = document.getElementById('feehub-page-loader');
       if (loader && !loader.classList.contains('loader-hidden')) {
@@ -174,8 +155,7 @@
     }, 600);
   });
 
-  // Fallback: never show loader for more than 12 seconds
-  // (handles Railway cold start worst case)
+  // Safety net - should never hit 12 seconds in normal use
   setTimeout(hideLoader, 12000);
 
 })();

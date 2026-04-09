@@ -179,12 +179,11 @@ const forgotPassword = async (req, res, next) => {
             `
         };
 
-        // Background processing: do not await transport
+        // Send the email in the background, we don't need to wait for it
         transporter.sendMail(message).catch(err => {
-            console.error("Background email failed for reset password:", err);
-            // Optionally, we could clear the token here since it failed, but we return to the user immediately.
+            console.error('Password reset email failed:', err);
         });
-        
+
         res.status(200).json({ success: true, message: 'Email will be sent shortly' });
 
     } catch (error) {

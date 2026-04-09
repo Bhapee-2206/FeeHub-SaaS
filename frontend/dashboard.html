@@ -338,7 +338,6 @@
         function initDashboard() {
             G('SUN').textContent = CU.name; G('SUR').textContent = CU.role === 'admin' ? 'Administrator' : 'Staff Member'; updateSidebarLogo();
             G('APP').style.opacity = '1'; buildNav(); render(); startClock();
-            // Hide the global page loader now that the dashboard is fully ready
             if (typeof window.feehubLoaderHide === 'function') window.feehubLoaderHide();
         }
 

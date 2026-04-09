@@ -3,24 +3,22 @@ const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const Student = require('../models/student');
 const Payment = require('../models/Payment');
-const User = require('../models/user'); 
-const Institution = require('../models/institution'); 
+const User = require('../models/user');
+const Institution = require('../models/institution');
 
 router.get('/stats', protect, async (req, res) => {
     try {
         const institutionId = req.user.institutionId;
-
-        
         const query = institutionId ? { institutionId } : {};
-        
+
         const students = await Student.find(query);
         const payments = await Payment.find(query);
         const user = await User.findById(req.user._id);
-        
-        let instName = "FeeHub Institution";
+
+        let instName = 'FeeHub Institution';
         let instLogo = '';
-        
-        if (institutionId && institutionId !== "null") {
+
+        if (institutionId && institutionId !== 'null') {
             try {
                 const institution = await Institution.findById(institutionId);
                 if (institution) {
@@ -28,7 +26,7 @@ router.get('/stats', protect, async (req, res) => {
                     instLogo = institution.logo || '';
                 }
             } catch (err) {
-                console.log("Institution fallback triggered.");
+                console.log('Institution lookup failed, using default name.');
             }
         }
 
@@ -59,7 +57,7 @@ router.get('/stats', protect, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error("Dashboard Stats Error:", error);
+        console.error('Dashboard Stats Error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
@@ -67,12 +65,13 @@ router.get('/stats', protect, async (req, res) => {
 
 router.get('/student-profile', protect, async (req, res) => {
     try {
-        if (req.user.role !== 'Student') return res.status(403).json({ success: false, message: 'Access denied.' });
-        
-        
+        if (req.user.role !== 'Student') {
+            return res.status(403).json({ success: false, message: 'Access denied.' });
+        }
+
         const payments = await Payment.find({ studentId: req.user._id }).sort({ paymentDate: -1, createdAt: -1 });
         const institution = await Institution.findById(req.user.institutionId);
-        
+
         res.json({
             success: true,
             data: {
@@ -86,10 +85,9 @@ router.get('/student-profile', protect, async (req, res) => {
     }
 });
 
-// ─── Update Institution Settings (Admin Name, Institution Name, Logo) ───
+
 router.put('/settings', protect, async (req, res) => {
     try {
-        // Only admins can update settings
         if (req.user.role !== 'InstitutionAdmin') {
             return res.status(403).json({ success: false, message: 'Only admins can update settings.' });
         }
@@ -97,17 +95,15 @@ router.put('/settings', protect, async (req, res) => {
         const { adminName, institutionName, logo } = req.body;
         const institutionId = req.user.institutionId;
 
-        // Update admin name
         if (adminName && adminName.trim()) {
             await User.findByIdAndUpdate(req.user._id, { name: adminName.trim() });
         }
 
-        // Update institution name and logo
         if (institutionId) {
             const updateData = {};
             if (institutionName && institutionName.trim()) updateData.name = institutionName.trim();
-            if (logo !== undefined) updateData.logo = logo; // allow empty string to clear logo
-            
+            if (logo !== undefined) updateData.logo = logo;
+
             if (Object.keys(updateData).length > 0) {
                 await Institution.findByIdAndUpdate(institutionId, updateData);
             }

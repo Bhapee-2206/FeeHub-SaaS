@@ -223,9 +223,9 @@
             }
         }
 
-        // ─── Instant dark overlay before navigation (kills white flash) ───
+        // Instant dark overlay injected before the browser navigates away.
+        // This bridges the white flash gap between login.html unloading and dashboard.html loading.
         function navigateTo(url) {
-            // Paint the screen immediately before redirect
             const overlay = document.createElement('div');
             overlay.style.cssText = [
                 'position:fixed', 'inset:0', 'z-index:999999',
@@ -244,13 +244,12 @@
                 <style>@keyframes _fhspin{to{transform:rotate(360deg)}}</style>
             `;
             document.body.appendChild(overlay);
-            // Redirect after one paint cycle so the overlay is visible
             requestAnimationFrame(() => requestAnimationFrame(() => {
                 window.location.replace(url);
             }));
         }
 
-        // ─── Login Submit ─────────────────────────────────
+        // Handle the login form submission
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
@@ -301,7 +300,7 @@
             }
         });
 
-        // ─── Forgot Password Modal ────────────────────────
+        // Forgot password modal controls
         function openForgotModal() {
             const modal = document.getElementById('forgotModal');
             modal.classList.add('active');
@@ -328,7 +327,7 @@
             if (e.key === 'Escape') closeForgotModal();
         });
 
-        // ─── Forgot Password Submit ──────────────────────
+        // Handle the forgot password form submission
         document.getElementById('forgotForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('forgotSubmitBtn');

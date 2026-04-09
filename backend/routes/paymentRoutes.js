@@ -126,9 +126,7 @@ router.post('/', protect, async (req, res) => {
         if (sendEmail === true && student.email) {
             const institution = await Institution.findById(req.user.institutionId);
             const instName = institution ? institution.name : 'FeeHub Institution';
-            
-            // Fire and forget: Do not await email sending to prevent slow UI
-            sendReceiptEmail(newPayment, student, instName).catch(err => console.error("Email background send failed:", err)); 
+            sendReceiptEmail(newPayment, student, instName).catch(err => console.error('Email send failed:', err));
         }
 
         res.status(201).json({ success: true, data: newPayment, message: 'Payment recorded. Email will be sent shortly.' });
@@ -148,9 +146,8 @@ router.post('/email-receipt/:id', protect, async (req, res) => {
         const institution = await Institution.findById(req.user.institutionId);
         const instName = institution ? institution.name : 'FeeHub Institution';
 
-        // Background processing
-        sendReceiptEmail(payment, payment.studentId, instName).catch(err => console.error(err));
-        
+        sendReceiptEmail(payment, payment.studentId, instName).catch(err => console.error('Email send failed:', err));
+
         res.json({ success: true, message: 'Receipt email will be sent shortly!' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
