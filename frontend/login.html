@@ -223,6 +223,33 @@
             }
         }
 
+        // ─── Instant dark overlay before navigation (kills white flash) ───
+        function navigateTo(url) {
+            // Paint the screen immediately before redirect
+            const overlay = document.createElement('div');
+            overlay.style.cssText = [
+                'position:fixed', 'inset:0', 'z-index:999999',
+                'background:#0a0e1a',
+                'display:flex', 'flex-direction:column',
+                'align-items:center', 'justify-content:center',
+                'gap:20px', 'transition:none'
+            ].join(';');
+            overlay.innerHTML = `
+                <div style="position:relative;width:56px;height:56px;">
+                    <div style="position:absolute;inset:0;border:3px solid rgba(99,102,241,0.2);border-radius:50%;"></div>
+                    <div style="position:absolute;inset:0;border:3px solid #6366f1;border-top-color:transparent;border-radius:50%;animation:_fhspin 0.8s linear infinite;"></div>
+                    <div style="position:absolute;inset:6px;background:#1e293b;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#6366f1;font-weight:900;font-size:11px;letter-spacing:-0.5px;">FH</div>
+                </div>
+                <div style="color:#94a3b8;font-size:12px;font-weight:600;letter-spacing:2px;font-family:'Inter',sans-serif;text-transform:uppercase;">Opening Workspace</div>
+                <style>@keyframes _fhspin{to{transform:rotate(360deg)}}</style>
+            `;
+            document.body.appendChild(overlay);
+            // Redirect after one paint cycle so the overlay is visible
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                window.location.replace(url);
+            }));
+        }
+
         // ─── Login Submit ─────────────────────────────────
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -256,9 +283,9 @@
                     }
                     localStorage.setItem('feehub_token', data.token);
                     if (payloadObj.role === 'Student') {
-                        window.location.replace('student-dashboard.html');
+                        navigateTo('student-dashboard.html');
                     } else {
-                        window.location.replace('dashboard.html');
+                        navigateTo('dashboard.html');
                     }
                 } else {
                     notif.className = 'p-4 rounded-xl text-sm font-bold border bg-red-50 text-red-600 mb-4 flex items-center gap-3';
