@@ -153,9 +153,15 @@
   window.feehubLoaderHide = hideLoader;
 
   window.addEventListener('load', function () {
-    // Standard window.load should still respect the minimum duration
-    hideLoader();
+    // Standard window.load should only hide the loader if the page
+    // hasn't explicitly requested manual control (like the dashboard).
+    if (!window.FEEHUB_MANUAL_LOADER) {
+        hideLoader();
+    }
   });
 
-  setTimeout(hideLoader, 15000); // Safety limit
+  // Safety net - increased for deployment robustness
+  setTimeout(() => {
+    if (!hideRequested) hideLoader();
+  }, 20000);
 })();
