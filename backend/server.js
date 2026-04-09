@@ -77,15 +77,9 @@ app.use((err, req, res, next) => {
 
 // ─── Start Server ───
 const PORT = process.env.PORT || 10000;
-
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log('───────────────────────────────────────');
-        console.log(`🚀 FeeHub Engine running on port ${PORT}`);
-        console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log('───────────────────────────────────────');
-    });
-}
-
-// Export for Vercel Serverless Function
-module.exports = app;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log('───────────────────────────────────────');
+    console.log(`🚀 FeeHub Engine running on port ${PORT}`);
+    console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log('───────────────────────────────────────');
+});

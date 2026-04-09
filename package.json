@@ -4,7 +4,7 @@
   "description": "FeeHub - Smart Fee Management SaaS for Educational Institutions",
   "scripts": {
     "start": "node backend/server.js",
-    "install-server": "cd backend && npm install"
+    "postinstall": "cd backend && npm install"
   },
   "engines": {
     "node": ">=18.0.0"
