@@ -1,5 +1,9 @@
 (function () {
   'use strict';
+  
+  const START_TIME = Date.now();
+  const MIN_DELAY = 1800; // Minimum time to show the cinematic UI
+  let hideRequested = false;
 
   // Instant Anti-Flash Injection
   const antiFlashStyle = document.createElement('style');
@@ -107,22 +111,30 @@
   }
 
   function hideLoader() {
-    if (statusInterval) clearInterval(statusInterval);
-    const loader = document.getElementById('feehub-page-loader');
-    const bar = document.getElementById('loader-progress-bar');
-    if (!loader) return;
+    if (hideRequested) return;
+    hideRequested = true;
 
-    if (bar) bar.style.width = '100%';
+    const elapsed = Date.now() - START_TIME;
+    const remaining = Math.max(0, MIN_DELAY - elapsed);
 
     setTimeout(function () {
-      loader.classList.add('loader-hidden');
-      const antiFlash = document.getElementById('feehub-anti-flash');
-      if (antiFlash) antiFlash.remove();
+        if (statusInterval) clearInterval(statusInterval);
+        const loader = document.getElementById('feehub-page-loader');
+        const bar = document.getElementById('loader-progress-bar');
+        if (!loader) return;
 
-      setTimeout(function () {
-        if (loader.parentNode) loader.parentNode.removeChild(loader);
-      }, 400);
-    }, 50);
+        if (bar) bar.style.width = '100%';
+
+        setTimeout(function () {
+            loader.classList.add('loader-hidden');
+            const antiFlash = document.getElementById('feehub-anti-flash');
+            if (antiFlash) antiFlash.remove();
+
+            setTimeout(function () {
+                if (loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 600);
+        }, 150);
+    }, remaining);
   }
 
   if (document.body) {
@@ -138,12 +150,8 @@
   window.feehubLoaderHide = hideLoader;
 
   window.addEventListener('load', function () {
-    setTimeout(function () {
-      const loader = document.getElementById('feehub-page-loader');
-      if (loader && !loader.classList.contains('loader-hidden')) {
-        hideLoader();
-      }
-    }, 300);
+    // Standard window.load should still respect the minimum duration
+    hideLoader();
   });
 
   setTimeout(hideLoader, 15000); // Safety limit
