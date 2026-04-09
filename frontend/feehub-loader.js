@@ -123,10 +123,12 @@
     setTimeout(function () {
       loader.classList.add('loader-hidden');
 
+      // Remove anti-flash as the loader begins to exit
+      const antiFlash = document.getElementById('feehub-anti-flash');
+      if (antiFlash) antiFlash.remove();
+
       setTimeout(function () {
         if (loader.parentNode) loader.parentNode.removeChild(loader);
-        const antiFlash = document.getElementById('feehub-anti-flash');
-        if (antiFlash) antiFlash.remove();
       }, 700);
     }, 400);
   }

@@ -139,9 +139,11 @@
             border-bottom: 1px solid rgba(226,232,240,0.6);
         }
 
-        /* Keep the body dark to match the loader background.
-           This prevents any white flash while the loader fades out. */
-        body { background-color: #0a0e1a; }
+        /* Force body and dashboard root to be dark by default to perfectly match the loader.
+           This ensures zero white flash even if the loader fades out slightly early. */
+        body { background-color: #0a0e1a !important; }
+        #APP { opacity: 0; background-color: #f4f6f9; transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        #APP.ready { opacity: 1; }
     </style>
 </head>
 
@@ -342,7 +344,12 @@
         function initDashboard() {
             G('SUN').textContent = CU.name; G('SUR').textContent = CU.role === 'admin' ? 'Administrator' : 'Staff Member'; updateSidebarLogo();
             buildNav(); render(); startClock();
-            if (typeof window.feehubLoaderHide === 'function') window.feehubLoaderHide();
+            
+            // Wait 100ms for the DOM to settle, then reveal the app and hide the loader
+            setTimeout(() => {
+                G('APP').classList.add('ready');
+                if (typeof window.feehubLoaderHide === 'function') window.feehubLoaderHide();
+            }, 100);
         }
 
         function startClock() {
