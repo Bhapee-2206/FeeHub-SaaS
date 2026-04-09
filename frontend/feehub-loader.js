@@ -2,7 +2,7 @@
   'use strict';
   
   const START_TIME = Date.now();
-  const MIN_DELAY = 1800; // Minimum time to show the cinematic UI
+  const MIN_DELAY = 2500; // Increased to ensure visibility on deployed environments
   let hideRequested = false;
 
   // Instant Anti-Flash Injection
@@ -47,7 +47,7 @@
 
       <div class="progress-wrap">
         <div class="progress-track">
-          <div class="progress-fill" id="loader-progress-bar"></div>
+          <div class="progress-fill" id="loader-progress-bar" style="width: 0%"></div>
           <div class="progress-scanner"></div>
         </div>
         <div class="status-label">
@@ -67,11 +67,11 @@
     const loaderEl = wrapper.firstChild;
     document.body.insertBefore(loaderEl, document.body.firstChild);
     
-    // Initial progress nudge
+    // Initial jump
     setTimeout(() => {
         const bar = document.getElementById('loader-progress-bar');
-        if (bar) bar.style.width = '50%';
-    }, 10);
+        if (bar) bar.style.width = '30%';
+    }, 20);
   }
 
   const statusMessages = [
@@ -99,15 +99,15 @@
         statusEl.textContent = statusMessages[msgIndex];
         statusEl.style.opacity = '1';
         
-        // Nudge progress bar
         if (bar) {
-            const currentWidth = parseInt(bar.style.width) || 35;
-            if (currentWidth < 90) {
-                bar.style.width = (currentWidth + Math.floor(Math.random() * 15)) + '%';
+            const currentWidth = parseInt(bar.style.width) || 30;
+            if (currentWidth < 95) {
+                const boost = 95 - currentWidth;
+                bar.style.width = (currentWidth + Math.min(10, boost * 0.4)) + '%';
             }
         }
       }, 300);
-    }, 1800);
+    }, 1500);
   }
 
   function hideLoader() {
@@ -115,23 +115,26 @@
     hideRequested = true;
 
     const elapsed = Date.now() - START_TIME;
-    const remaining = Math.max(0, MIN_DELAY - elapsed);
+    // On deployment, if network is slow, remaining might be 0, but we still 
+    // want a tiny buffer for the "100%" bar to be seen.
+    const remaining = Math.max(200, MIN_DELAY - elapsed);
 
     setTimeout(function () {
         if (statusInterval) clearInterval(statusInterval);
         const loader = document.getElementById('feehub-page-loader');
         const bar = document.getElementById('loader-progress-bar');
-        if (!loader) return;
-
+        const statusEl = document.getElementById('loader-status-text');
+        
         if (bar) bar.style.width = '100%';
+        if (statusEl) statusEl.textContent = 'System Ready';
 
         setTimeout(function () {
-            loader.classList.add('loader-hidden');
+            if (loader) loader.classList.add('loader-hidden');
             const antiFlash = document.getElementById('feehub-anti-flash');
             if (antiFlash) antiFlash.remove();
 
             setTimeout(function () {
-                if (loader.parentNode) loader.parentNode.removeChild(loader);
+                if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
             }, 600);
         }, 150);
     }, remaining);
