@@ -21,7 +21,7 @@
   flex-direction: column;
   background: var(--loader-bg);
   opacity: 1;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: all;
   overflow: hidden;
   font-family: 'Inter', -apple-system, sans-serif;

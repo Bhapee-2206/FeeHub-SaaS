@@ -356,11 +356,11 @@
             G('SUN').textContent = CU.name; G('SUR').textContent = CU.role === 'admin' ? 'Administrator' : 'Staff Member'; updateSidebarLogo();
             buildNav(); render(); startClock();
             
-            // Wait 100ms for the DOM to settle, then reveal the app and hide the loader
-            setTimeout(() => {
+            // Instantly reveal the app and hide the loader
+            requestAnimationFrame(() => {
                 G('APP').classList.add('ready');
                 if (typeof window.feehubLoaderHide === 'function') window.feehubLoaderHide();
-            }, 100);
+            });
         }
 
         function startClock() {

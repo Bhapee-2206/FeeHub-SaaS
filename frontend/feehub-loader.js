@@ -66,8 +66,8 @@
     // Initial progress nudge
     setTimeout(() => {
         const bar = document.getElementById('loader-progress-bar');
-        if (bar) bar.style.width = '35%';
-    }, 100);
+        if (bar) bar.style.width = '50%';
+    }, 10);
   }
 
   const statusMessages = [
@@ -121,8 +121,8 @@
 
       setTimeout(function () {
         if (loader.parentNode) loader.parentNode.removeChild(loader);
-      }, 800);
-    }, 500);
+      }, 400);
+    }, 50);
   }
 
   if (document.body) {
@@ -143,7 +143,7 @@
       if (loader && !loader.classList.contains('loader-hidden')) {
         hideLoader();
       }
-    }, 800);
+    }, 300);
   });
 
   setTimeout(hideLoader, 15000); // Safety limit
