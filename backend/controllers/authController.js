@@ -127,16 +127,7 @@ const forgotPassword = async (req, res, next) => {
         const host = req.headers['x-forwarded-host'] || req.get('host');
         const resetUrl = `${protocol}://${host}/reset-password.html?token=${resetToken}`;
 
-        // Configure Nodemailer to use SendGrid
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.sendgrid.net',
-            port: 587,
-            auth: {
-                user: 'apikey',
-                pass: process.env.SENDGRID_API_KEY
-            }
-        });
-
+        // Configure the email to be sent
         const message = {
             from: `"FeeHub" <${process.env.EMAIL_USER}>`,
             to: user.email,
@@ -179,8 +170,9 @@ const forgotPassword = async (req, res, next) => {
             `
         };
 
-        // Send the email in the background, we don't need to wait for it
-        transporter.sendMail(message).catch(err => {
+        // Send the email in the background via centralized service
+        const { sendEmail } = require('../utils/emailService');
+        sendEmail(message).catch(err => {
             console.error('Password reset email failed:', err);
         });
 

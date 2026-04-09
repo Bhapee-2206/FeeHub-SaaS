@@ -4,16 +4,7 @@ const { protect } = require('../middleware/authMiddleware');
 const Payment = require('../models/Payment');
 const Student = require('../models/student');
 const Institution = require('../models/institution');
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.sendgrid.net',
-    port: 587,
-    auth: {
-       user: 'apikey', 
-       pass: process.env.SENDGRID_API_KEY
-    }
-});
+const { sendEmail } = require('../utils/emailService');
 
 async function sendReceiptEmail(payment, student, instName) {
     try {
@@ -35,7 +26,7 @@ async function sendReceiptEmail(payment, student, instName) {
         }
 
         const mailOptions = {
-            from: `"${instName}" <bhapeestudios@gmail.com>`,
+            from: `"${instName}" <${process.env.EMAIL_USER}>`,
             to: student.email,
             subject: `Payment Receipt: ${payment.receiptNumber || 'FeeHub'} - ${instName}`,
             html: `
@@ -70,7 +61,7 @@ async function sendReceiptEmail(payment, student, instName) {
             </div>`
         };
 
-        await transporter.sendMail(mailOptions);
+        await sendEmail(mailOptions);
         return true;
     } catch (e) {
         console.error("Email error:", e);
