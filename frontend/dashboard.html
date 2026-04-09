@@ -141,7 +141,7 @@
 
 <body class="flex h-screen overflow-hidden overflow-x-hidden text-slate-800 antialiased selection:bg-indigo-100">
 
-    <div id="APP" class="flex w-full h-full relative overflow-x-hidden animate-fade-in">
+    <div id="APP" class="flex w-full h-full opacity-0 transition-opacity duration-500 relative overflow-x-hidden">
         <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-20 hidden lg:hidden"
             onclick="toggleSidebar()"></div>
         <aside id="sidebar"
@@ -186,26 +186,18 @@
                 <div class="flex items-center gap-4">
                     <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-slate-800 transition-colors p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                     <div>
-                        <h2 class="text-[17px] font-extrabold text-slate-900 truncate leading-tight" id="PT">Loading Workspace</h2>
+                        <h2 class="text-[17px] font-extrabold text-slate-900 truncate leading-tight" id="PT">Dashboard</h2>
                         <p class="text-[11px] text-slate-400 font-medium hidden sm:block" id="headerClock"></p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="hidden sm:inline-flex items-center gap-2 text-[12px] font-bold text-indigo-700 bg-indigo-50 px-4 py-1.5 rounded-full border border-indigo-100" id="headerInstName">
                         <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                        Connecting...
+                        Loading...
                     </span>
                 </div>
             </header>
-            <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 relative z-10 flex flex-col items-center justify-center" id="CT">
-                <div class="flex flex-col items-center justify-center animate-fade-in opacity-70">
-                    <div class="relative w-16 h-16 mb-4">
-                        <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
-                        <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
-                    </div>
-                    <p class="text-sm font-bold text-slate-500 tracking-widest uppercase">Fetching Data...</p>
-                </div>
-            </div>
+            <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 relative z-10" id="CT"></div>
         </main>
     </div>
 
@@ -296,19 +288,13 @@
 
         async function fetchDashboardData() {
             try {
-                const res = await fetch('/api/dashboard/data', { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch('/api/dashboard/stats', { headers: { 'Authorization': `Bearer ${token}` } });
                 const result = await res.json();
 
                 if (res.status === 401) { logout(); return; }
 
                 if (result.success) {
-                    DASH_DATA = result.data.stats;
-                    STUDENTS = result.data.students || [];
-                    PAYMENTS = result.data.payments || [];
-                    COURSES = result.data.courses || [];
-                    FEE_STRUCTURES = result.data.feeStructures || [];
-                    STAFF_DATA = result.data.staffData || [];
-
+                    DASH_DATA = result.data;
                     CU.name = DASH_DATA.userName || 'Admin';
                     CU.institutionName = DASH_DATA.institutionName || 'FeeHub Institution';
                     CU.institutionLogo = DASH_DATA.institutionLogo || '';
@@ -317,14 +303,21 @@
                     G('headerInstName').textContent = CU.institutionName;
                     updateSidebarLogo();
 
+                    await Promise.all([fetchStudents(), fetchPayments(), fetchFees(), fetchCourses(), fetchStaffData()]);
                     initDashboard();
                 } else {
                     G('CT').innerHTML = `<div class="bg-red-50 text-red-600 p-8 rounded-2xl font-bold text-center mx-auto max-w-xl mt-12 shadow-sm border border-red-200 animate-slide-up"><h2 class="text-2xl mb-2 text-red-700">Backend Error 🛑</h2><p class="text-sm font-medium text-red-500 mb-6">${result.message}</p><button onclick="logout()" class="bg-red-600 text-white px-6 py-2.5 rounded-xl text-sm hover:bg-red-700 shadow-md">Return to Login</button></div>`;
+                    G('APP').style.opacity = '1';
                 }
             } catch (error) {
-                G('CT').innerHTML = `<div class="bg-red-50 text-red-600 p-6 rounded-xl font-bold text-center mx-4 mt-4 shadow-sm">🔌 Cannot connect to backend server.</div>`;
+                G('CT').innerHTML = `<div class="bg-red-50 text-red-600 p-6 rounded-xl font-bold text-center mx-4 mt-4 shadow-sm">🔌 Cannot connect to backend server.</div>`; G('APP').style.opacity = '1';
             }
         }
+        async function fetchStudents() { try { const res = await fetch('/api/students', { headers: { 'Authorization': `Bearer ${token}` } }); const result = await res.json(); if (result.success) STUDENTS = result.data; } catch (e) { } }
+        async function fetchPayments() { try { const res = await fetch('/api/payments', { headers: { 'Authorization': `Bearer ${token}` } }); const result = await res.json(); if (result.success) PAYMENTS = result.data; } catch (e) { } }
+        async function fetchFees() { try { const res = await fetch('/api/fee-structures', { headers: { 'Authorization': `Bearer ${token}` } }); const result = await res.json(); if (result.success) FEE_STRUCTURES = result.data; } catch (e) { } }
+        async function fetchCourses() { try { const res = await fetch('/api/courses', { headers: { 'Authorization': `Bearer ${token}` } }); const result = await res.json(); if (result.success) COURSES = result.data; } catch (e) { } }
+        async function fetchStaffData() { try { const res = await fetch('/api/staff', { headers: { 'Authorization': `Bearer ${token}` } }); const result = await res.json(); if (result.success) STAFF_DATA = result.data; } catch (e) { } }
 
         function updateSidebarLogo() {
             const logoEl = G('sidebarLogo');
@@ -342,7 +335,7 @@
 
         function initDashboard() {
             G('SUN').textContent = CU.name; G('SUR').textContent = CU.role === 'admin' ? 'Administrator' : 'Staff Member'; updateSidebarLogo();
-            buildNav(); render(); startClock();
+            G('APP').style.opacity = '1'; buildNav(); render(); startClock();
         }
 
         function startClock() {
