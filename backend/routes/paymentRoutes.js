@@ -7,10 +7,11 @@ const Institution = require('../models/institution');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.sendgrid.net',
+    port: 587,
     auth: {
-       user: 'bhapeestudios@gmail.com', 
-       pass: 'bvhg mweg nqhr jeqd'
+       user: 'apikey', 
+       pass: process.env.SENDGRID_API_KEY
     }
 });
 
@@ -126,10 +127,11 @@ router.post('/', protect, async (req, res) => {
             const institution = await Institution.findById(req.user.institutionId);
             const instName = institution ? institution.name : 'FeeHub Institution';
             
-            sendReceiptEmail(newPayment, student, instName); 
+            // Fire and forget: Do not await email sending to prevent slow UI
+            sendReceiptEmail(newPayment, student, instName).catch(err => console.error("Email background send failed:", err)); 
         }
 
-        res.status(201).json({ success: true, data: newPayment });
+        res.status(201).json({ success: true, data: newPayment, message: 'Payment recorded. Email will be sent shortly.' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -146,13 +148,10 @@ router.post('/email-receipt/:id', protect, async (req, res) => {
         const institution = await Institution.findById(req.user.institutionId);
         const instName = institution ? institution.name : 'FeeHub Institution';
 
-        const success = await sendReceiptEmail(payment, payment.studentId, instName);
+        // Background processing
+        sendReceiptEmail(payment, payment.studentId, instName).catch(err => console.error(err));
         
-        if (success) {
-            res.json({ success: true, message: 'Receipt emailed successfully!' });
-        } else {
-            res.status(500).json({ success: false, message: 'Email server rejected the request.' });
-        }
+        res.json({ success: true, message: 'Receipt email will be sent shortly!' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

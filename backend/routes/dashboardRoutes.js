@@ -5,6 +5,8 @@ const Student = require('../models/student');
 const Payment = require('../models/Payment');
 const User = require('../models/user'); 
 const Institution = require('../models/institution'); 
+const Course = require('../models/course');
+const FeeStructure = require('../models/FeeStructure');
 
 router.get('/stats', protect, async (req, res) => {
     try {
@@ -60,6 +62,72 @@ router.get('/stats', protect, async (req, res) => {
         });
     } catch (error) {
         console.error("Dashboard Stats Error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+router.get('/data', protect, async (req, res) => {
+    try {
+        const institutionId = req.user.institutionId;
+        const query = institutionId ? { institutionId } : {};
+
+        // Run queries in parallel and use .lean() for performance
+        const [students, payments, courses, feeStructures, staff, user] = await Promise.all([
+            Student.find(query).lean(),
+            Payment.find(query).populate('studentId', 'name studentIdNumber course batch email phone parentName').lean(),
+            Course.find(query).lean(),
+            FeeStructure.find(query).lean(),
+            User.find({ ...query, role: { $ne: 'Student' } }).select('-password').lean(),
+            User.findById(req.user._id).lean()
+        ]);
+
+        let instName = "FeeHub Institution";
+        let instLogo = '';
+        if (institutionId && institutionId !== "null") {
+            try {
+                const institution = await Institution.findById(institutionId).lean();
+                if (institution) {
+                    instName = institution.name;
+                    instLogo = institution.logo || '';
+                }
+            } catch (err) {}
+        }
+
+        let totalCollected = 0;
+        let pendingDues = 0;
+        let activeStudents = 0;
+
+        students.forEach(student => {
+            if (student.status !== 'Completed') {
+                activeStudents++;
+                totalCollected += (student.paid || 0);
+                pendingDues += Math.max(0, (student.totalFees || 0) - (student.paid || 0));
+            }
+        });
+
+        res.json({
+            success: true,
+            data: {
+                stats: {
+                    userName: user ? user.name : 'Admin',
+                    userId: user ? user._id : null,
+                    userRole: user ? user.role : 'Staff',
+                    institutionName: instName,
+                    institutionLogo: instLogo,
+                    totalCollected,
+                    pendingDues,
+                    totalStudents: activeStudents,
+                    transactions: payments.length
+                },
+                students,
+                payments,
+                courses,
+                feeStructures,
+                staffData: staff
+            }
+        });
+    } catch (error) {
+        console.error("Dashboard Data Error:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 });

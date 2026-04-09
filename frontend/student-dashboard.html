@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -32,6 +32,8 @@
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.8); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .glass-card:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
     </style>
+    <link rel="stylesheet" href="feehub-loader.css">
+    <script src="feehub-loader.js"></script>
 </head>
 <body class="text-slate-800 antialiased selection:bg-blue-200 opacity-0 transition-opacity duration-500 overflow-x-hidden" id="APP">
 
@@ -70,15 +72,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div class="glass-card rounded-3xl p-6 border-t-4 border-t-slate-400 animate-slide-up" style="animation-delay: 50ms;">
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Total Program Fee</p>
-                <h3 class="text-4xl font-black text-slate-900" id="statTotalFee">₹0</h3>
+                <h3 class="text-4xl font-black text-slate-900" id="statTotalFee">â‚¹0</h3>
             </div>
             <div class="glass-card rounded-3xl p-6 border-t-4 border-t-emerald-500 shadow-sm shadow-emerald-500/10 animate-slide-up" style="animation-delay: 100ms;">
                 <p class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">Total Paid Amount</p>
-                <h3 class="text-4xl font-black text-emerald-600" id="statPaid">₹0</h3>
+                <h3 class="text-4xl font-black text-emerald-600" id="statPaid">â‚¹0</h3>
             </div>
             <div class="glass-card rounded-3xl p-6 border-t-4 border-t-red-500 shadow-md shadow-red-500/10 animate-slide-up" style="animation-delay: 150ms;" id="dueCard">
                 <p class="text-xs font-bold text-red-500 uppercase tracking-widest mb-2">Pending Due Balance</p>
-                <h3 class="text-4xl font-black text-red-500" id="statDue">₹0</h3>
+                <h3 class="text-4xl font-black text-red-500" id="statDue">â‚¹0</h3>
             </div>
         </div>
 
@@ -121,7 +123,7 @@ let STUDENT_DATA = null;
 let PAYMENTS = [];
 let INSTITUTION_NAME = "FeeHub";
 
-const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+const fmt = n => 'â‚¹' + Number(n).toLocaleString('en-IN');
 const ini = n => (n || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
 function logout() {
@@ -174,7 +176,7 @@ function renderDashboard() {
     document.getElementById('studentNameDisplay').textContent = STUDENT_DATA.name;
     document.getElementById('studentIdDisplay').textContent = `Roll No: ${STUDENT_DATA.studentIdNumber || 'N/A'}`;
     document.getElementById('avatarBox').textContent = ini(STUDENT_DATA.name);
-    document.getElementById('courseBatchDisplay').textContent = `${STUDENT_DATA.course} • ${STUDENT_DATA.batch}`;
+    document.getElementById('courseBatchDisplay').textContent = `${STUDENT_DATA.course} â€¢ ${STUDENT_DATA.batch}`;
     
     
     const due = Math.max(0, STUDENT_DATA.totalFees - STUDENT_DATA.paid);
@@ -278,3 +280,4 @@ loadData();
 </script>
 </body>
 </html>
+

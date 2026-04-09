@@ -6,7 +6,7 @@ const path = require('path');
 const helmet = require('helmet');
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Initialize the Express app
 const app = express();

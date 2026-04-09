@@ -127,12 +127,13 @@ const forgotPassword = async (req, res, next) => {
         const host = req.headers['x-forwarded-host'] || req.get('host');
         const resetUrl = `${protocol}://${host}/reset-password.html?token=${resetToken}`;
 
-        // Configure Nodemailer to use your Gmail
+        // Configure Nodemailer to use SendGrid
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.sendgrid.net',
+            port: 587,
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
+                user: 'apikey',
+                pass: process.env.SENDGRID_API_KEY
             }
         });
 
@@ -178,8 +179,13 @@ const forgotPassword = async (req, res, next) => {
             `
         };
 
-        await transporter.sendMail(message);
-        res.status(200).json({ success: true, message: 'Email sent successfully' });
+        // Background processing: do not await transport
+        transporter.sendMail(message).catch(err => {
+            console.error("Background email failed for reset password:", err);
+            // Optionally, we could clear the token here since it failed, but we return to the user immediately.
+        });
+        
+        res.status(200).json({ success: true, message: 'Email will be sent shortly' });
 
     } catch (error) {
         // If email fails, clear the database token so they can try again

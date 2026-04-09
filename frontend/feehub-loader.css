@@ -1,0 +1,463 @@
+/* ═══════════════════════════════════════════════════════════════
+   FeeHub SaaS — Premium Page Transition Loader
+   A cinematic, high-fidelity loading screen for page transitions.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Base Overlay ──────────────────────────────────────────── */
+#feehub-page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: #0a0e1a;
+  opacity: 1;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: all;
+  overflow: hidden;
+}
+
+#feehub-page-loader.loader-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Animated Background Mesh ─────────────────────────────── */
+#feehub-page-loader .loader-bg-mesh {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+#feehub-page-loader .loader-bg-mesh::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+  animation: loaderMeshRotate 12s ease-in-out infinite;
+}
+
+@keyframes loaderMeshRotate {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  33% { transform: rotate(5deg) scale(1.05); }
+  66% { transform: rotate(-3deg) scale(0.98); }
+}
+
+/* ── Floating Orbs ────────────────────────────────────────── */
+.loader-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: loaderOrbFloat 8s ease-in-out infinite;
+}
+
+.loader-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  top: -10%;
+  right: -5%;
+  animation-delay: 0s;
+  animation-duration: 10s;
+}
+
+.loader-orb-2 {
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  bottom: -8%;
+  left: -5%;
+  animation-delay: -3s;
+  animation-duration: 12s;
+}
+
+.loader-orb-3 {
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  top: 40%;
+  left: 60%;
+  animation-delay: -6s;
+  animation-duration: 9s;
+  opacity: 0.2;
+}
+
+@keyframes loaderOrbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.1); }
+  50% { transform: translate(-20px, 30px) scale(0.9); }
+  75% { transform: translate(15px, 15px) scale(1.05); }
+}
+
+/* ── Grid Lines ───────────────────────────────────────────── */
+.loader-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: loaderGridShift 20s linear infinite;
+}
+
+@keyframes loaderGridShift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(60px, 60px); }
+}
+
+/* ── Particle Field ───────────────────────────────────────── */
+.loader-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.loader-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.6);
+  animation: loaderParticleRise linear infinite;
+}
+
+@keyframes loaderParticleRise {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-10vh) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* ── Center Content ───────────────────────────────────────── */
+.loader-center {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+/* ── Logo Container ───────────────────────────────────────── */
+.loader-logo-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinning ring */
+.loader-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #6366f1;
+  border-right-color: rgba(99, 102, 241, 0.3);
+  animation: loaderRingSpin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+.loader-ring-2 {
+  inset: -16px;
+  border-top-color: #8b5cf6;
+  border-right-color: rgba(139, 92, 246, 0.2);
+  animation-duration: 2.5s;
+  animation-direction: reverse;
+}
+
+.loader-ring-3 {
+  inset: -24px;
+  border-top-color: #10b981;
+  border-right-color: rgba(16, 185, 129, 0.15);
+  animation-duration: 3.5s;
+}
+
+@keyframes loaderRingSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Pulsing glow behind logo */
+.loader-logo-glow {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.4), transparent 70%);
+  border-radius: 50%;
+  animation: loaderGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes loaderGlowPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.6); opacity: 0.2; }
+}
+
+/* Main logo block */
+.loader-logo {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  box-shadow: 
+    0 0 30px rgba(99, 102, 241, 0.4),
+    0 0 60px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  animation: loaderLogoBounce 2s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes loaderLogoBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(-2deg); }
+  75% { transform: translateY(3px) rotate(1deg); }
+}
+
+/* ── Brand Name ───────────────────────────────────────────── */
+.loader-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.loader-brand-name {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 50%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: loaderTextShimmer 3s ease-in-out infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes loaderTextShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.loader-brand-tagline {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.6);
+  animation: loaderTaglineFade 2s ease-in-out infinite;
+}
+
+@keyframes loaderTaglineFade {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* ── Progress Bar ─────────────────────────────────────────── */
+.loader-progress-container {
+  width: 240px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6, #a78bfa, #6366f1);
+  background-size: 300% 100%;
+  animation: loaderProgressFill 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+             loaderProgressGradient 2s linear infinite;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+}
+
+@keyframes loaderProgressFill {
+  0% { width: 0%; }
+  20% { width: 25%; }
+  50% { width: 55%; }
+  70% { width: 70%; }
+  85% { width: 85%; }
+  100% { width: 95%; }
+}
+
+@keyframes loaderProgressGradient {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+.loader-progress-bar.complete {
+  animation: loaderProgressComplete 0.4s ease forwards,
+             loaderProgressGradient 2s linear infinite;
+}
+
+@keyframes loaderProgressComplete {
+  0% { width: 95%; }
+  100% { width: 100%; }
+}
+
+/* ── Loading Status Text ──────────────────────────────────── */
+.loader-status {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(148, 163, 184, 0.5);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loader-status-dot {
+  width: 6px;
+  height: 6px;
+  background: #6366f1;
+  border-radius: 50%;
+  animation: loaderDotPulse 1s ease-in-out infinite;
+}
+
+.loader-status-dot:nth-child(2) { animation-delay: 0.2s; }
+.loader-status-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes loaderDotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.5); opacity: 1; }
+}
+
+/* ── DNA Helix (decorative side element) ──────────────────── */
+.loader-helix {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  opacity: 0.15;
+}
+
+.loader-helix-right {
+  left: auto;
+  right: 5%;
+}
+
+.loader-helix-dot {
+  width: 4px;
+  height: 4px;
+  background: #6366f1;
+  border-radius: 50%;
+  animation: loaderHelixWave 2s ease-in-out infinite;
+}
+
+@keyframes loaderHelixWave {
+  0%, 100% { transform: translateX(0); opacity: 0.3; }
+  50% { transform: translateX(20px); opacity: 1; }
+}
+
+.loader-helix-right .loader-helix-dot {
+  animation-name: loaderHelixWaveReverse;
+}
+
+@keyframes loaderHelixWaveReverse {
+  0%, 100% { transform: translateX(0); opacity: 0.3; }
+  50% { transform: translateX(-20px); opacity: 1; }
+}
+
+/* ── Scan Line ────────────────────────────────────────────── */
+.loader-scanline {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.15), transparent);
+  animation: loaderScanMove 3s linear infinite;
+  top: 0;
+}
+
+@keyframes loaderScanMove {
+  0% { top: -2px; }
+  100% { top: 100%; }
+}
+
+/* ── Bottom Hex Grid ──────────────────────────────────────── */
+.loader-hex-strip {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  opacity: 0.12;
+}
+
+.loader-hex {
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.6);
+  border-radius: 2px;
+  transform: rotate(45deg);
+  animation: loaderHexBlink 3s ease-in-out infinite;
+}
+
+@keyframes loaderHexBlink {
+  0%, 100% { opacity: 0.2; transform: rotate(45deg) scale(0.8); }
+  50% { opacity: 1; transform: rotate(45deg) scale(1); background: rgba(99, 102, 241, 0.3); }
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .loader-logo {
+    width: 56px;
+    height: 56px;
+    font-size: 18px;
+    border-radius: 16px;
+  }
+  .loader-logo-container {
+    width: 80px;
+    height: 80px;
+  }
+  .loader-brand-name {
+    font-size: 24px;
+  }
+  .loader-progress-container {
+    width: 180px;
+  }
+  .loader-helix {
+    display: none;
+  }
+  .loader-orb-3 {
+    display: none;
+  }
+}
