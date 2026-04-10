@@ -1,62 +1,67 @@
 const nodemailer = require('nodemailer');
-const sgMail = require('@sendgrid/mail');
 
 /**
- * FeeHub Universal Email Engine
- * Uses SendGrid HTTP API for Reliable Cloud Deployment (Bypasses Port Blocks)
- * Uses Gmail SMTP for Localhost Development
+ * FeeHub Email Engine (Gmail SMTP Edition)
+ * Uses Gmail App Passwords for secure delivery.
+ * Note: Ensure EMAIL_USER and EMAIL_PASS are set in your deployment dashboard.
  */
 const sendEmail = async (options) => {
-    // 1. PRIMARY: SendGrid API (Best for Deployment/Railway/Vercel)
-    // SendGrid API uses HTTP (Port 443), which is NEVER blocked by cloud providers.
-    if (process.env.SENDGRID_API_KEY) {
-        try {
-            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-            const msg = {
-                to: options.to,
-                from: process.env.EMAIL_USER || 'noreply@feehub.com', 
-                subject: options.subject,
-                html: options.html,
-            };
-            const info = await sgMail.send(msg);
-            console.log("✅ [SendGrid API] Email sent successfully");
-            return info;
-        } catch (error) {
-            console.error("❌ [SendGrid API] Error:", error.response ? error.response.body : error.message);
-            // If SendGrid fails, we don't return, we try the Gmail fallback below
-        }
+    const senderEmail = process.env.EMAIL_USER;
+    const senderName = 'FeeHub';
+
+    // Guard: Check for credentials
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error("🚨 [EmailService] Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+        return { success: false, error: 'Missing credentials' };
     }
 
-    // 2. SECONDARY: Gmail SMTP (Good for Localhost, often blocked in Cloud)
-    if (process.env.EMAIL_PASS && process.env.EMAIL_USER) {
-        try {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
+    console.log(`📧 Attempting Gmail SMTP delivery to: ${options.to}`);
 
-            const mailOptions = {
-                from: options.from || `"FeeHub" <${process.env.EMAIL_USER}>`,
-                to: options.to,
-                subject: options.subject,
-                html: options.html
-            };
+    try {
+        // Create Transporter optimized for Gmail
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // Use SSL
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
 
-            const info = await transporter.sendMail(mailOptions);
-            console.log("✅ [Gmail SMTP] Email sent successfully:", info.messageId);
-            return info;
-        } catch (error) {
-            console.error("❌ [Gmail SMTP] Delivery failed. Reason:", error.message);
-            throw error;
+        // Prepare Mail Options
+        const mailOptions = {
+            from: `"${senderName}" <${senderEmail}>`,
+            to: options.to,
+            subject: options.subject,
+            html: options.html,
+            text: options.text || options.html.replace(/<[^>]*>?/gm, '') // Auto-generate plain text
+        };
+
+        // Send the mail
+        const info = await transporter.sendMail(mailOptions);
+        
+        console.log("✅ [Gmail SMTP] Message sent successfully:", info.messageId);
+        return { 
+            success: true, 
+            provider: 'gmail', 
+            messageId: info.messageId 
+        };
+
+    } catch (error) {
+        console.error("❌ [Gmail SMTP] Critical Failure:");
+        console.error("   - Reason:", error.message);
+        
+        if (error.message.includes('EAUTH')) {
+            console.error("   💡 TIP: This is an Authentication error. Double-check your 16-character 'App Password'.");
+        } else if (error.message.includes('ECONN') || error.message.includes('ETIMEDOUT')) {
+            console.error("   💡 TIP: Connection failed. This usually means your hosting provider (Render/Railway) is blocking outgoing SMTP ports.");
         }
-    }
 
-    // 3. FALLBACK: Log to console if no credentials found
-    console.warn("⚠️ [EmailService] No credentials found. Email simulated for:", options.to);
-    return { messageId: 'simulated-' + Date.now() };
+        throw error;
+    }
 };
 
 module.exports = { sendEmail };
+

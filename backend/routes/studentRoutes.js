@@ -16,7 +16,18 @@ router.get('/', protect, async (req, res) => {
 
 router.post('/', protect, async (req, res) => {
     try {
-        const newStudent = await Student.create({ ...req.body, institutionId: req.user.institutionId });
+        const studentData = { ...req.body, institutionId: req.user.institutionId };
+        
+        // Custom ID Logic: First 3 of Name + (Last 4 of Phone OR Last 4 of Email)
+        if (!studentData.studentIdNumber) {
+            const namePart = (studentData.name || 'STU').replace(/\s/g, '').substring(0, 3).toUpperCase();
+            const phonePart = (studentData.phone && studentData.phone.length >= 4) 
+                ? studentData.phone.slice(-4) 
+                : (studentData.email ? studentData.email.split('@')[0].slice(-4) : '0000');
+            studentData.studentIdNumber = `${namePart}${phonePart}`;
+        }
+
+        const newStudent = await Student.create(studentData);
         res.status(201).json({ success: true, data: newStudent });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -29,8 +40,12 @@ router.post('/bulk', protect, async (req, res) => {
         const operations = req.body.students.map((s, idx) => {
             let sId = s.studentIdNumber || '';
             if (!sId) {
-                const cPrefix = (s.course || 'STU').substring(0, 3).toUpperCase();
-                sId = `${cPrefix}-${Date.now().toString().slice(-4)}${Math.floor(Math.random() * 1000)}${idx}`;
+                const namePart = (s.name || 'STU').replace(/\s/g, '').substring(0, 3).toUpperCase();
+                // Predictable fallback: Last 4 of Phone, else Last 4 of Email, else Index-based
+                const phonePart = (s.phone && s.phone.length >= 4) 
+                    ? s.phone.slice(-4) 
+                    : (s.email ? s.email.split('@')[0].slice(-4) : (1000 + idx).toString().slice(-4));
+                sId = `${namePart}${phonePart}`;
             }
             s.studentIdNumber = sId;
             s.institutionId = req.user.institutionId;
