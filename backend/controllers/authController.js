@@ -119,9 +119,9 @@ const forgotPassword = async (req, res, next) => {
         // Generate a random token
         const resetToken = crypto.randomBytes(20).toString('hex');
 
-        // Hash it and save to database with a 10-minute expiration
+        // Hash it and save to database with a 60-minute expiration
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+        user.resetPasswordExpire = Date.now() + 60 * 60 * 1000;
         await user.save({ validateBeforeSave: false });
 
         // Create the reset URL pointing to your frontend
@@ -209,12 +209,16 @@ const resetPassword = async (req, res, next) => {
         // Re-hash the token from the URL to match what is saved in the DB
         const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
+        console.log(`🔑 Reset attempt with token: ...${req.params.token.slice(-5)}`);
+        console.log(`🔎 Hashed token: ${resetPasswordToken.slice(0, 10)}...`);
+
         const user = await User.findOne({
             resetPasswordToken,
             resetPasswordExpire: { $gt: Date.now() } // Ensure it hasn't expired
         });
 
         if (!user) {
+            console.warn('❌ Reset failed: Token not found or expired in DB');
             return res.status(400).json({ success: false, message: 'Invalid or expired token' });
         }
 
