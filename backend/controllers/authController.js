@@ -108,8 +108,9 @@ const loginUser = async (req, res, next) => {
 // @desc    Forgot Password - Sends email with reset token
 // @route   POST /api/auth/forgot-password
 const forgotPassword = async (req, res, next) => {
+    let email = '';
     try {
-        const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
+        email = req.body.email ? req.body.email.trim().toLowerCase() : '';
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ success: false, message: 'There is no user with that email' });

@@ -18,14 +18,19 @@ const sendEmail = async (options) => {
     console.log(`📧 Attempting Gmail SMTP delivery to: ${options.to}`);
 
     try {
-        // Create Transporter optimized for Gmail
-        // Note: 'service: gmail' automatically sets host, port, and secure settings.
+        // Create Transporter optimized for Hosting Providers (Render/Railway)
+        // Port 465 is often blocked, so we use Port 587 with STARTTLS
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            pool: true, // Reuse connections
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false, // Use STARTTLS (standard for port 587)
+            pool: true,
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
+            },
+            tls: {
+                rejectUnauthorized: false // Helps with some restricted environments
             }
         });
 
