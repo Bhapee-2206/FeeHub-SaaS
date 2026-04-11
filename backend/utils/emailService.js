@@ -11,6 +11,8 @@ const sendEmail = async (options) => {
     const senderEmail = process.env.EMAIL_USER;
     const senderName = 'FeeHub';
 
+    console.log(`🔍 [EmailService] Config Check: SENDGRID_API_KEY=${process.env.SENDGRID_API_KEY ? 'FOUND' : 'MISSING'}`);
+
     // Strategy 1: Attempt SendGrid API (Fastest & most reliable on Render)
     if (process.env.SENDGRID_API_KEY) {
         try {
@@ -23,9 +25,14 @@ const sendEmail = async (options) => {
                     email: senderEmail,
                     name: senderName
                 },
+                replyTo: senderEmail,
                 subject: options.subject,
                 html: options.html,
-                text: options.text || options.html.replace(/<[^>]*>?/gm, '')
+                text: options.text || options.html.replace(/<[^>]*>?/gm, ''),
+                headers: {
+                    'Precedence': 'Bulk',
+                    'X-Auto-Response-Suppress': 'OOF, AutoReply'
+                }
             };
 
             const [response] = await sgMail.send(msg);

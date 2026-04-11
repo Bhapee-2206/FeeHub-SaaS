@@ -166,8 +166,15 @@ const forgotPassword = async (req, res, next) => {
                 <a href="${resetUrl}" style="color:#2563eb;word-break:break-all;">${resetUrl}</a>
             </p>
         </div>
-        <div style="background-color:#f8fafc;padding:20px;text-align:center;border-top:1px solid #e2e8f0;">
-            <p style="margin:0;font-size:12px;color:#94a3b8;">&copy; ${new Date().getFullYear()} FeeHub SaaS</p>
+        <div style="background-color:#f8fafc;padding:30px 40px;text-align:center;border-top:1px solid #e2e8f0;">
+            <p style="margin:0 0 10px;font-size:12px;color:#94a3b8;line-height:1.5;">
+                &copy; ${new Date().getFullYear()} FeeHub SaaS. All rights reserved.<br>
+                Bhapee Studios &middot; Innovating Campus Management
+            </p>
+            <p style="margin:0;font-size:11px;color:#cbd5e1;">
+                This is a mandatory service email related to your account security.<br>
+                You are receiving this because a password reset was requested for this email.
+            </p>
         </div>
     </div>
 </body>
