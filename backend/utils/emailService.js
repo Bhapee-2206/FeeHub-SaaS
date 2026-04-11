@@ -18,15 +18,21 @@ const sendEmail = async (options) => {
     console.log(`📧 Attempting Gmail SMTP delivery to: ${options.to}`);
 
     try {
-        // Create Transporter using Gmail Service with Pooling
+        // Create Transporter using Gmail Service 
+        // Added timeouts to help with slow connections in hosting environments
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            pool: true, // Reuse connections for speed
+            pool: true,
+            connectionTimeout: 15000, // 15 seconds
+            greetingTimeout: 15000,
+            socketTimeout: 30000, // 30 seconds
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
             }
         });
+
+        console.log(`🔗 SMTP Transporter initialized for ${process.env.EMAIL_USER}`);
 
         // Prepare Mail Options
         const mailOptions = {
