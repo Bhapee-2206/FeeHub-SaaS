@@ -219,17 +219,28 @@ const resetPassword = async (req, res, next) => {
         }
 
         // Set the new password
+        if (!req.body.password) {
+            return res.status(400).json({ success: false, message: 'Please provide a new password' });
+        }
+
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(req.body.password, salt);
 
         // Clear the temporary reset fields
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
-        await user.save();
+        
+        // Use validateBeforeSave: false to avoid issues with other fields 
+        // that might have been changed in the schema since the user was created
+        await user.save({ validateBeforeSave: false });
 
         res.status(200).json({ success: true, message: 'Password reset successful. You can now log in.' });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error resetting password' });
+        console.error('CRITICAL: Reset Password Error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: `Server Error: ${error.message}` // Expose error for debugging
+        });
     }
 };
 
