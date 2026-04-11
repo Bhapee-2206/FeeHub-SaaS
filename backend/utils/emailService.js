@@ -23,9 +23,10 @@ const sendEmail = async (options) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             pool: true,
-            connectionTimeout: 15000, // 15 seconds
+            connectionTimeout: 15000, 
             greetingTimeout: 15000,
-            socketTimeout: 30000, // 30 seconds
+            socketTimeout: 30000,
+            family: 4, // Force IPv4 to avoid ENETUNREACH on IPv6-unfriendly hosts
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
