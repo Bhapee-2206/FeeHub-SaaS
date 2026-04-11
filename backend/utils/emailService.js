@@ -1,76 +1,77 @@
+const sgMail = require('@sendgrid/mail');
 const nodemailer = require('nodemailer');
 
 /**
- * FeeHub Email Engine (Gmail SMTP Edition)
- * Optimized for reliability. Note: Works best in local environments.
- * Cloud hosts (Render/Railway) may block SMTP ports; use Gmail API if that happens.
+ * FeeHub Multi-Provider Email Engine
+ * Optimized for Performance & Reliability.
+ * Uses SendGrid API by default (to bypass Cloud SMTP blocking)
+ * Falls back to Gmail SMTP for local redundancy.
  */
 const sendEmail = async (options) => {
     const senderEmail = process.env.EMAIL_USER;
     const senderName = 'FeeHub';
 
-    // Guard: Check for credentials
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error("🚨 [EmailService] Missing EMAIL_USER or EMAIL_PASS in environment variables.");
-        return { success: false, error: 'Missing credentials' };
-    }
+    // Strategy 1: Attempt SendGrid API (Fastest & most reliable on Render)
+    if (process.env.SENDGRID_API_KEY) {
+        try {
+            console.log(`🚀 [EmailService] Attempting SendGrid API delivery to: ${options.to}`);
+            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-    console.log(`📧 Attempting Gmail SMTP delivery to: ${options.to}`);
+            const msg = {
+                to: options.to,
+                from: {
+                    email: senderEmail,
+                    name: senderName
+                },
+                subject: options.subject,
+                html: options.html,
+                text: options.text || options.html.replace(/<[^>]*>?/gm, '')
+            };
 
-    try {
-        // Create Transporter using Gmail Service 
-        // Added timeouts to help with slow connections in hosting environments
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            pool: true,
-            connectionTimeout: 15000, 
-            greetingTimeout: 15000,
-            socketTimeout: 30000,
-            family: 4, // Force IPv4 to avoid ENETUNREACH on IPv6-unfriendly hosts
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        console.log(`🔗 SMTP Transporter initialized for ${process.env.EMAIL_USER}`);
-
-        // Prepare Mail Options
-        const mailOptions = {
-            from: senderEmail, // Simpler from address often improves deliverability
-            to: options.to,
-            subject: options.subject,
-            html: options.html,
-            text: options.text || options.html.replace(/<[^>]*>?/gm, ''),
-            headers: {
-                'X-Priority': '1 (Highest)',
-                'Importance': 'High',
-                'X-Entity-Ref-ID': Date.now().toString() // Help prevent threading/folding
-            }
-        };
-
-        // Send the mail
-        const info = await transporter.sendMail(mailOptions);
-        
-        console.log("✅ [Gmail SMTP] Message sent successfully. ID:", info.messageId);
-        return { 
-            success: true, 
-            provider: 'gmail', 
-            messageId: info.messageId 
-        };
-
-    } catch (error) {
-        console.error("❌ [Gmail SMTP] Critical Failure:");
-        console.error("   - Reason:", error.message);
-        
-        if (error.message.includes('EAUTH')) {
-            console.error("   💡 TIP: Authentication failed. Check your 'App Password'.");
-        } else if (error.message.includes('ETIMEDOUT')) {
-            console.error("   💡 TIP: Connection timed out. This often happens on Render/Railway due to blocked SMTP ports.");
+            const [response] = await sgMail.send(msg);
+            
+            console.log("✅ [SendGrid API] Message sent instantly. Status:", response.statusCode);
+            return { success: true, provider: 'sendgrid' };
+        } catch (error) {
+            console.error("⚠️ [SendGrid API] Failed. Falling back to SMTP...");
+            if (error.response) console.error("   - Detail:", error.response.body.errors[0].message);
         }
-
-        throw error;
     }
+
+    // Strategy 2: Fallback to Gmail SMTP (May be blocked on Render, but works locally)
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        try {
+            console.log(`📧 [EmailService] Attempting Gmail SMTP fallback to: ${options.to}`);
+            
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                pool: true,
+                connectionTimeout: 10000,
+                family: 4,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                }
+            });
+
+            const mailOptions = {
+                from: `"${senderName}" <${senderEmail}>`,
+                to: options.to,
+                subject: options.subject,
+                html: options.html
+            };
+
+            const info = await transporter.sendMail(mailOptions);
+            console.log("✅ [Gmail SMTP] Message sent successfully:", info.messageId);
+            return { success: true, provider: 'gmail' };
+        } catch (error) {
+            console.error("❌ [Gmail SMTP] Critical Failure:", error.message);
+            throw error;
+        }
+    }
+
+    console.error("🚨 [EmailService] No valid email configuration found (Missing keys).");
+    return { success: false, error: 'No config' };
 };
 
 module.exports = { sendEmail };
