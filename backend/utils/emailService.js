@@ -1,53 +1,59 @@
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 
 /**
- * FeeHub Email Engine (SendGrid API Edition)
- * Optimized for Hosting Providers like Render/Railway that block SMTP ports.
- * Uses HTTP Port 443 to bypass firewall restrictions.
+ * FeeHub Email Engine (Gmail SMTP Edition)
+ * Optimized for reliability. Note: Works best in local environments.
+ * Cloud hosts (Render/Railway) may block SMTP ports; use Gmail API if that happens.
  */
 const sendEmail = async (options) => {
-    // Guard: Check for SendGrid API Key
-    if (!process.env.SENDGRID_API_KEY) {
-        console.error("🚨 [EmailService] Missing SENDGRID_API_KEY in environment variables.");
-        return { success: false, error: 'Missing API Key' };
-    }
-
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-    const senderEmail = process.env.EMAIL_USER || 'bhapeestudios@gmail.com';
+    const senderEmail = process.env.EMAIL_USER;
     const senderName = 'FeeHub';
 
-    console.log(`📧 Attempting SendGrid API delivery to: ${options.to}`);
+    // Guard: Check for credentials
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error("🚨 [EmailService] Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+        return { success: false, error: 'Missing credentials' };
+    }
+
+    console.log(`📧 Attempting Gmail SMTP delivery to: ${options.to}`);
 
     try {
-        const msg = {
+        // Create Transporter using Gmail Service
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        // Prepare Mail Options
+        const mailOptions = {
+            from: `"${senderName}" <${senderEmail}>`,
             to: options.to,
-            from: {
-                email: senderEmail,
-                name: senderName
-            },
             subject: options.subject,
             html: options.html,
-            text: options.text || options.html.replace(/<[^>]*>?/gm, '')
+            text: options.text || options.html.replace(/<[^>]*>?/gm, '') // Auto-generate plain text
         };
 
-        const [response] = await sgMail.send(msg);
+        // Send the mail
+        const info = await transporter.sendMail(mailOptions);
         
-        console.log("✅ [SendGrid API] Message sent successfully. Status:", response.statusCode);
+        console.log("✅ [Gmail SMTP] Message sent successfully:", info.messageId);
         return { 
             success: true, 
-            provider: 'sendgrid', 
-            statusCode: response.statusCode 
+            provider: 'gmail', 
+            messageId: info.messageId 
         };
 
     } catch (error) {
-        console.error("❌ [SendGrid API] Critical Failure:");
+        console.error("❌ [Gmail SMTP] Critical Failure:");
+        console.error("   - Reason:", error.message);
         
-        if (error.response) {
-            console.error("   - Status:", error.response.body.errors[0].message);
-            console.log("   💡 TIP: SendGrid returned an error. Ensure your 'EMAIL_USER' is a Verified Sender in SendGrid.");
-        } else {
-            console.error("   - Reason:", error.message);
+        if (error.message.includes('EAUTH')) {
+            console.error("   💡 TIP: Authentication failed. Check your 'App Password'.");
+        } else if (error.message.includes('ETIMEDOUT')) {
+            console.error("   💡 TIP: Connection timed out. This often happens on Render/Railway due to blocked SMTP ports.");
         }
 
         throw error;
