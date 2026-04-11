@@ -8,24 +8,27 @@ const nodemailer = require('nodemailer');
  * Falls back to Gmail SMTP for local redundancy.
  */
 const sendEmail = async (options) => {
-    const senderEmail = process.env.EMAIL_USER;
+    const senderEmail = process.env.EMAIL_USER || '';
     const senderName = 'FeeHub';
 
-    console.log(`🔍 [EmailService] Config Check: SENDGRID_API_KEY=${process.env.SENDGRID_API_KEY ? 'FOUND' : 'MISSING'}`);
+    console.log(`🔍 [EmailService] DEBUG START:`);
+    console.log(`   - To: ${options.to}`);
+    console.log(`   - From: ${senderEmail}`);
+    console.log(`   - SG_KEY: ${process.env.SENDGRID_API_KEY ? 'Present (Hash: ' + process.env.SENDGRID_API_KEY.substring(0, 10) + '...)' : 'MISSING'}`);
 
-    // Strategy 1: Attempt SendGrid API (Fastest & most reliable on Render)
+    // Strategy 1: Attempt SendGrid API 
     if (process.env.SENDGRID_API_KEY) {
         try {
-            console.log(`🚀 [EmailService] Attempting SendGrid API delivery to: ${options.to}`);
-            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+            console.log(`🚀 [EmailService] Strategy 1: Attempting SendGrid API...`);
+            sgMail.setApiKey(process.env.SENDGRID_API_KEY.trim());
 
             const msg = {
                 to: options.to,
                 from: {
-                    email: senderEmail,
+                    email: senderEmail.trim(),
                     name: senderName
                 },
-                replyTo: senderEmail,
+                replyTo: senderEmail.trim(),
                 subject: options.subject,
                 html: options.html,
                 text: options.text || options.html.replace(/<[^>]*>?/gm, ''),
@@ -37,11 +40,17 @@ const sendEmail = async (options) => {
 
             const [response] = await sgMail.send(msg);
             
-            console.log("✅ [SendGrid API] Message sent instantly. Status:", response.statusCode);
+            console.log(`✅ [EmailService] SendGrid Success! Status code: ${response.statusCode}`);
+            console.log(`   - Message ID: ${response.headers['x-message-id']}`);
             return { success: true, provider: 'sendgrid' };
         } catch (error) {
-            console.error("⚠️ [SendGrid API] Failed. Falling back to SMTP...");
-            if (error.response) console.error("   - Detail:", error.response.body.errors[0].message);
+            console.error("⚠️ [EmailService] SendGrid reported an error:");
+            if (error.response) {
+                console.error("   - Errors:", JSON.stringify(error.response.body.errors, null, 2));
+            } else {
+                console.error("   - Message:", error.message);
+            }
+            console.log("🔄 [EmailService] Trying fallback to SMTP...");
         }
     }
 
