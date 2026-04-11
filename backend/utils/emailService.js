@@ -18,9 +18,10 @@ const sendEmail = async (options) => {
     console.log(`📧 Attempting Gmail SMTP delivery to: ${options.to}`);
 
     try {
-        // Create Transporter using Gmail Service
+        // Create Transporter using Gmail Service with Pooling
         const transporter = nodemailer.createTransport({
             service: 'gmail',
+            pool: true, // Reuse connections for speed
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
@@ -29,17 +30,22 @@ const sendEmail = async (options) => {
 
         // Prepare Mail Options
         const mailOptions = {
-            from: `"${senderName}" <${senderEmail}>`,
+            from: senderEmail, // Simpler from address often improves deliverability
             to: options.to,
             subject: options.subject,
             html: options.html,
-            text: options.text || options.html.replace(/<[^>]*>?/gm, '') // Auto-generate plain text
+            text: options.text || options.html.replace(/<[^>]*>?/gm, ''),
+            headers: {
+                'X-Priority': '1 (Highest)',
+                'Importance': 'High',
+                'X-Entity-Ref-ID': Date.now().toString() // Help prevent threading/folding
+            }
         };
 
         // Send the mail
         const info = await transporter.sendMail(mailOptions);
         
-        console.log("✅ [Gmail SMTP] Message sent successfully:", info.messageId);
+        console.log("✅ [Gmail SMTP] Message sent successfully. ID:", info.messageId);
         return { 
             success: true, 
             provider: 'gmail', 
