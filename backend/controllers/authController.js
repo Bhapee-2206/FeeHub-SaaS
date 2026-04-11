@@ -109,7 +109,8 @@ const loginUser = async (req, res, next) => {
 // @route   POST /api/auth/forgot-password
 const forgotPassword = async (req, res, next) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
+        const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ success: false, message: 'There is no user with that email' });
         }
@@ -170,23 +171,30 @@ const forgotPassword = async (req, res, next) => {
             `
         };
 
-        // Send the email in the background via centralized service
+        // Send the email and wait for completion to catch errors
         const { sendEmail } = require('../utils/emailService');
-        sendEmail(message).catch(err => {
-            console.error('Password reset email failed:', err);
-        });
+        await sendEmail(message);
 
-        res.status(200).json({ success: true, message: 'Email will be sent shortly' });
+        res.status(200).json({ success: true, message: 'Reset link sent to your email.' });
 
     } catch (error) {
+        console.error('Forgot Password Error:', error.message);
         // If email fails, clear the database token so they can try again
-        const user = await User.findOne({ email: req.body.email });
-        if (user) {
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpire = undefined;
-            await user.save({ validateBeforeSave: false });
+        try {
+            const user = await User.findOne({ email });
+            if (user) {
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpire = undefined;
+                await user.save({ validateBeforeSave: false });
+            }
+        } catch (dbError) {
+            console.error('Database cleanup after email failure failed:', dbError.message);
         }
-        res.status(500).json({ success: false, message: 'Email could not be sent' });
+        
+        res.status(500).json({ 
+            success: false, 
+            message: error.message.includes('EAUTH') ? 'Email authentication failed. Contact developer.' : 'Email could not be sent. Please try again later.'
+        });
     }
 };
 

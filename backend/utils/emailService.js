@@ -19,11 +19,10 @@ const sendEmail = async (options) => {
 
     try {
         // Create Transporter optimized for Gmail
+        // Note: 'service: gmail' automatically sets host, port, and secure settings.
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // Use SSL
+            pool: true, // Reuse connections
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
@@ -51,12 +50,12 @@ const sendEmail = async (options) => {
 
     } catch (error) {
         console.error("❌ [Gmail SMTP] Critical Failure:");
-        console.error("   - Reason:", error.message);
+        console.log("   - Full Error:", error);
         
         if (error.message.includes('EAUTH')) {
-            console.error("   💡 TIP: This is an Authentication error. Double-check your 16-character 'App Password'.");
-        } else if (error.message.includes('ECONN') || error.message.includes('ETIMEDOUT')) {
-            console.error("   💡 TIP: Connection failed. This usually means your hosting provider (Render/Railway) is blocking outgoing SMTP ports.");
+            console.error("   💡 TIP: Authentication failed. This usually means the 'App Password' is invalid or has been revoked.");
+        } else if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+            console.error("   💡 TIP: Connection refused/timed out. Your hosting provider might be blocking SMTP (Port 465/587).");
         }
 
         throw error;
