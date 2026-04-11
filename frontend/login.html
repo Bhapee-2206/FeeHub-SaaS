@@ -355,7 +355,7 @@
                     notif.className = 'p-4 rounded-xl text-sm font-semibold mb-5 flex items-center gap-3 bg-emerald-50 text-emerald-700 border border-emerald-200';
                     notif.innerHTML = `
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>Reset link sent! Check your inbox at <strong>${email}</strong>. The link expires in 10 minutes.</span>
+                        <span>Reset link sent! Check your inbox at <strong>${email}</strong>. <br><br> <strong class="text-emerald-800 underline">⚠️ IMPORTANT:</strong> If you don't see it, please check your <strong>Spam or Junk</strong> folder. The link expires in 60 minutes.</span>
                     `;
                     document.getElementById('forgotForm').style.display = 'none';
                 } else {

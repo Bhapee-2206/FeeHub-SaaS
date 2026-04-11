@@ -34,7 +34,8 @@ const sendEmail = async (options) => {
                 text: options.text || options.html.replace(/<[^>]*>?/gm, ''),
                 headers: {
                     'Precedence': 'Bulk',
-                    'X-Auto-Response-Suppress': 'OOF, AutoReply'
+                    'X-Auto-Response-Suppress': 'OOF, AutoReply',
+                    'List-Unsubscribe': `<mailto:${senderEmail}?subject=unsubscribe>`
                 }
             };
 
