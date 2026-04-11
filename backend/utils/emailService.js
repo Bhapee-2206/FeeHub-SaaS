@@ -1,66 +1,53 @@
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 
 /**
- * FeeHub Email Engine (Gmail SMTP Edition)
- * Uses Gmail App Passwords for secure delivery.
- * Note: Ensure EMAIL_USER and EMAIL_PASS are set in your deployment dashboard.
+ * FeeHub Email Engine (SendGrid API Edition)
+ * Optimized for Hosting Providers like Render/Railway that block SMTP ports.
+ * Uses HTTP Port 443 to bypass firewall restrictions.
  */
 const sendEmail = async (options) => {
-    const senderEmail = process.env.EMAIL_USER;
-    const senderName = 'FeeHub';
-
-    // Guard: Check for credentials
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error("🚨 [EmailService] Missing EMAIL_USER or EMAIL_PASS in environment variables.");
-        return { success: false, error: 'Missing credentials' };
+    // Guard: Check for SendGrid API Key
+    if (!process.env.SENDGRID_API_KEY) {
+        console.error("🚨 [EmailService] Missing SENDGRID_API_KEY in environment variables.");
+        return { success: false, error: 'Missing API Key' };
     }
 
-    console.log(`📧 Attempting Gmail SMTP delivery to: ${options.to}`);
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+    const senderEmail = process.env.EMAIL_USER || 'bhapeestudios@gmail.com';
+    const senderName = 'FeeHub';
+
+    console.log(`📧 Attempting SendGrid API delivery to: ${options.to}`);
 
     try {
-        // Create Transporter optimized for Hosting Providers (Render/Railway)
-        // Port 465 is often blocked, so we use Port 587 with STARTTLS
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false, // Use STARTTLS (standard for port 587)
-            pool: true,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: false // Helps with some restricted environments
-            }
-        });
-
-        // Prepare Mail Options
-        const mailOptions = {
-            from: `"${senderName}" <${senderEmail}>`,
+        const msg = {
             to: options.to,
+            from: {
+                email: senderEmail,
+                name: senderName
+            },
             subject: options.subject,
             html: options.html,
-            text: options.text || options.html.replace(/<[^>]*>?/gm, '') // Auto-generate plain text
+            text: options.text || options.html.replace(/<[^>]*>?/gm, '')
         };
 
-        // Send the mail
-        const info = await transporter.sendMail(mailOptions);
+        const [response] = await sgMail.send(msg);
         
-        console.log("✅ [Gmail SMTP] Message sent successfully:", info.messageId);
+        console.log("✅ [SendGrid API] Message sent successfully. Status:", response.statusCode);
         return { 
             success: true, 
-            provider: 'gmail', 
-            messageId: info.messageId 
+            provider: 'sendgrid', 
+            statusCode: response.statusCode 
         };
 
     } catch (error) {
-        console.error("❌ [Gmail SMTP] Critical Failure:");
-        console.log("   - Full Error:", error);
+        console.error("❌ [SendGrid API] Critical Failure:");
         
-        if (error.message.includes('EAUTH')) {
-            console.error("   💡 TIP: Authentication failed. This usually means the 'App Password' is invalid or has been revoked.");
-        } else if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-            console.error("   💡 TIP: Connection refused/timed out. Your hosting provider might be blocking SMTP (Port 465/587).");
+        if (error.response) {
+            console.error("   - Status:", error.response.body.errors[0].message);
+            console.log("   💡 TIP: SendGrid returned an error. Ensure your 'EMAIL_USER' is a Verified Sender in SendGrid.");
+        } else {
+            console.error("   - Reason:", error.message);
         }
 
         throw error;
