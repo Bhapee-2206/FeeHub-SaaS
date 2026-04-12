@@ -264,10 +264,10 @@
         const G = id => document.getElementById(id);
 
         function downloadStudentTemplate() {
-            const csvContent = "RollNo,Name,Course,Batch,Email,Phone,ParentName,TotalFees\n"
-                + "CS-001,Arjun Kumar,BCA,2025-2028,arjun.k81@gmail.com,9880000001,Rajesh Kumar,45000\n"
-                + "CS-002,Priya Sharma,BCA,2025-2028,priya.s2@gmail.com,9880000002,Suresh Sharma,45000\n"
-                + "BA-001,Rahul Verma,BBA,2026-2029,rahul.v681@gmail.com,9880000003,Anil Verma,50000";
+            const csvContent = "RollNo,Name,Course,Batch,Email,Phone,ParentName\n"
+                + "CS-001,Arjun Kumar,BCA,2025-2028,arjun.k81@gmail.com,9880000001,Rajesh Kumar\n"
+                + "CS-002,Priya Sharma,BCA,2025-2028,priya.s2@gmail.com,9880000002,Suresh Sharma\n"
+                + "BA-001,Rahul Verma,BBA,2026-2029,rahul.v681@gmail.com,9880000003,Anil Verma";
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
@@ -557,7 +557,7 @@
         }
 
         function pgAcademics() {
-            let cRows = COURSES.map((c, index) => `<tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors"><td class="py-4 px-4"><p class="text-sm font-bold text-slate-800">${c.name}</p></td><td class="py-4 px-4 text-sm text-slate-600">${c.duration}</td><td class="py-4 px-4 text-right"><button onclick="editCourse(${index})" class="text-blue-600 font-bold text-xs bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">Edit</button></td></tr>`).join('');
+            let cRows = COURSES.map((c, index) => `<tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors"><td class="py-4 px-4"><p class="text-sm font-bold text-slate-800">${c.name}</p></td><td class="py-4 px-4 text-sm text-slate-600">${c.duration}</td><td class="py-4 px-4 text-right"><button onclick="openCourseModal(${index})" class="text-blue-600 font-bold text-xs bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">Edit</button></td></tr>`).join('');
             let cTableHTML = COURSES.length > 0 ? `<div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="bg-slate-50 border-b border-slate-100"><th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Course Name</th><th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Duration</th><th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th></tr></thead><tbody>${cRows}</tbody></table></div>` : `<div class="py-8 text-center text-slate-400 font-bold">No courses defined.</div>`;
             let fRows = FEE_STRUCTURES.map((f, i) => `<tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors"><td class="py-4 px-4"><p class="text-sm font-bold text-slate-800">${f.course}</p><p class="text-xs text-slate-400 mt-0.5">${f.batchYear}</p></td><td class="py-4 px-4 text-sm text-slate-600">${f.feeComponents.length} Items</td><td class="py-4 px-4 text-sm font-bold text-emerald-600">${fmt(f.totalFee)}</td><td class="py-4 px-4 text-right"><button onclick="openFeeModal(${i})" class="text-blue-600 font-bold text-xs bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">Edit</button></td></tr>`).join('');
             let fTableHTML = FEE_STRUCTURES.length > 0 ? `<div class="overflow-x-auto"><table class="w-full text-left"><thead><tr class="bg-slate-50 border-b border-slate-100"><th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Course & Batch</th><th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Components</th><th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Total Fee</th><th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th></tr></thead><tbody>${fRows}</tbody></table></div>` : `<div class="py-8 text-center text-slate-400 font-bold">No master fees defined.</div>`;
@@ -1137,9 +1137,9 @@
                             const parsedCourse = row.Course || row.course || '';
                             const parsedBatch = row.Batch || row.batch || '';
 
-                            // 🚀 Auto-Assign Fees if missing based on Master Config (Reimplemented User Feature)
-                            let assignedFee = Number(row.TotalFees || row.totalFees || row.Total || row.total || 0);
-                            if (assignedFee === 0 && parsedCourse && parsedBatch) {
+                            // 🚀 Auto-Assign Fees based ONLY on Admin Config (Ignoring CSV values as requested)
+                            let assignedFee = 0;
+                            if (parsedCourse && parsedBatch) {
                                 const structure = FEE_STRUCTURES.find(f =>
                                     String(f.course).trim().toLowerCase() === String(parsedCourse).trim().toLowerCase() &&
                                     String(f.batchYear).trim().toLowerCase() === String(parsedBatch).trim().toLowerCase()
