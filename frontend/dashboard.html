@@ -1329,7 +1329,7 @@
     <script>
         // 🔒 CORRECT DASHBOARD SECURITY
         window.addEventListener('pageshow', function (event) {
-            if (event.persisted && !localStorage.getItem('feehub_token')) {
+            if (!localStorage.getItem('feehub_token')) {
                 window.location.replace('login.html');
             }
         });

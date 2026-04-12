@@ -55,7 +55,15 @@ app.use('/api/hq', require('./routes/hqRoutes'));
 app.use('/api/student-portal', require('./routes/studentPortalRoutes'));
 
 // ─── Serve Frontend (static files) ───
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend'), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+            res.setHeader('Expires', '-1');
+            res.setHeader('Pragma', 'no-cache');
+        }
+    }
+}));
 
 // SPA-style catch-all: serve login.html for any non-API GET request
 app.use((req, res, next) => {

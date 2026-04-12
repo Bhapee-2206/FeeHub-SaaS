@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -171,6 +171,15 @@
                 btn.innerHTML = originalText; 
                 btn.disabled = false; 
                 btn.classList.remove('opacity-90');
+            }
+        });
+        window.addEventListener('pageshow', function () {
+            const t = localStorage.getItem('feehub_token');
+            if (t) {
+                try {
+                    const p = JSON.parse(atob(t.split('.')[1]));
+                    if (p.role === 'SuperAdmin') window.location.replace('superadmin.html');
+                } catch (e) {}
             }
         });
     </script>

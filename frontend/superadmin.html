@@ -260,6 +260,11 @@
         let INSTITUTIONS = [];
 
         function logout() { localStorage.removeItem('feehub_token'); window.location.replace('hq-login.html'); }
+        window.addEventListener('pageshow', function () {
+            if (!localStorage.getItem('feehub_token')) {
+                window.location.replace('hq-login.html');
+            }
+        });
         function closeM() { document.getElementById('OV').classList.replace('flex', 'hidden'); }
         function openProvisionModal() {
             document.getElementById('provisionForm').reset();

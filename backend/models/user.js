@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     institutionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Institution',
-        required: true
+        required: false
     },
     name: {
         type: String,

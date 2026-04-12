@@ -6,16 +6,43 @@
 
 ---
 
-## ✨ Key Features
+## 🛠️ Comprehensive Feature Suite
 
--   **Multi-Role Dashboard**: Tailored experiences for SuperAdmins, Instituion HQs, and Students.
--   **Automated Fee Tracking**: Real-time monitoring of paid, pending, and overdue fees.
--   **Professional Receipts**: Automated email receipts powered by SendGrid and Nodemailer.
--   **Advanced Security**: JWT-based authentication, password hashing with Bcrypt, and production-grade security headers using Helmet.
--   **Global Search & Filters**: Efficiently manage thousands of student records and transactions.
--   **Dynamic Analytics**: Visual representation of collection trends and institutional performance.
+### 1. 🏢 Multi-Tenant Institution Management (HQ)
+*   **Centralized Command Center**: Real-time tracking of platform-wide revenue, total enrollment, and active instances from a high-level SuperAdmin perspective.
+*   **Instance Lifecycle Control**: Instantly provision, suspend, or reactivate institutional tenants to manage subscription states or compliance.
+*   **Logical Data Isolation**: Each tenant's data (Students, Staff, Payments) is strictly partitioned at the logic layer for multi-tenant security.
+*   **Nuclear Wipe Safety**: Administrative capability to securely erase all data associated with a specific tenant while maintaining system integrity.
 
-![Dashboard Mockup](feehub_dashboard_mockup_1775929499892.png)
+### 2. 💰 Advanced Fee & Revenue Architecture
+*   **Dynamic Fee Modeling**: Create granular fee structures mapped to specific Courses and Academic Batches for precise financial planning.
+*   **Component-based Breakdown**: Define custom fee categories (Tuition, Lab, Library, Sports, etc.) within each model for transparent billing.
+*   **Automated Balance Sync**: Modifying a fee structure automatically triggers a platform-wide recalculation of dues for all enrolled students in that batch.
+*   **Total Debt Management**: Systemic tracking of "Total Fees" vs "Paid" with real-time "Net Balance" calculation for every student.
+
+### 3. 🎓 Smart Student & Staff Administration
+*   **Automated ID Generation**: Proprietary logic generates unique Student IDs based on enrollment patterns and contact data.
+*   **Staff RBAC Management**: Manage institution staff with specific roles, allowing for delegated payment recording and student updates.
+*   **Bulk Operations Engine**: High-performance bulk import/upsert system for managing thousands of records via localized API optimization.
+*   **Lifecycle Monitoring**: Real-time audit of student admission status, course progress, and contact information.
+
+### 4. 💳 Omni-channel Payment Operations
+*   **Multi-Method Recording**: Log payments via Cash, UPI, Bank Transfer, or Online gateways with custom transaction ID tracking.
+*   **Late Fee & Penalty Engine**: Apply discretionary or automated fines that track independently of core academic balances.
+*   **Hybrid Receipting**: Support for both auto-generated digital receipt numbers and manual physical book references.
+*   **Instant Ledger Settlement**: Payments are processed in real-time, removing manual reconciliation burdens for accountants.
+
+### 5. 📨 Automated Communication Pipeline
+*   **Branded HTML Receipts**: Professional email receipts featuring the institution's colors and branding delivered instantly upon payment.
+*   **Accountability Summaries**: Transaction emails include a proactive "Current Dues" summary to keep students informed of their status.
+*   **Resend Mastery**: One-click administrative ability to trigger manual receipt delivery if a student loses their copy.
+*   **Smart Delivery Routing**: Native integration with SendGrid and Nodemailer ensuring high deliverability to inbox (bypassing spam).
+
+### 6. 🎨 Premium User Experience (UX/UI)
+*   **Nebula Engine Loader**: A sophisticated, glassmorphic page loader that handles asset initialization while providing a premium first impression.
+*   **Midnight Aesthetic**: Dark-themed, high-contrast dashboard designed for professional usage and readability.
+*   **Responsive Flow**: Fully optimized for desktop and mobile browsers, ensuring access from anywhere.
+*   **Anti-Flash System**: Proprietary logic prevents FOUC (Flash of Unstyled Content) during heavy page loads.
 
 ---
 

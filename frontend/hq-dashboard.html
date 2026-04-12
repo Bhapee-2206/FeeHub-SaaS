@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -218,6 +218,12 @@ const fmt = n => 'â‚¹' + Number(n).toLocaleString('en-IN');
 const fmtShort = n => { n = Number(n); if (n >= 10000000) return 'â‚¹' + (n/10000000).toFixed(1) + 'Cr'; if (n >= 100000) return 'â‚¹' + (n/100000).toFixed(1) + 'L'; if (n >= 1000) return 'â‚¹' + (n/1000).toFixed(1) + 'K'; return 'â‚¹' + n; };
 
 function logout() { localStorage.removeItem('feehub_token'); window.location.replace('hq-login.html'); }
+
+window.addEventListener('pageshow', function () {
+    if (!localStorage.getItem('feehub_token')) {
+        window.location.replace('hq-login.html');
+    }
+});
 
 function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
