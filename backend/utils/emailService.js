@@ -22,11 +22,14 @@ const sendEmail = async (options) => {
             console.log(`🚀 [EmailService] Strategy 1: Attempting SendGrid API...`);
             sgMail.setApiKey(process.env.SENDGRID_API_KEY.trim());
 
+            // Use custom name if provided in options (e.g. from paymentRoutes)
+            const resolvedName = options.fromName || senderName;
+
             const msg = {
                 to: options.to,
                 from: {
                     email: senderEmail.trim(),
-                    name: senderName
+                    name: resolvedName
                 },
                 replyTo: senderEmail.trim(),
                 subject: options.subject,

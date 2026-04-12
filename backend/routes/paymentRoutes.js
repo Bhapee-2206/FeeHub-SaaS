@@ -26,7 +26,7 @@ async function sendReceiptEmail(payment, student, instName) {
         }
 
         const mailOptions = {
-            from: `"${instName}" <${process.env.EMAIL_USER}>`,
+            fromName: instName,
             to: student.email,
             subject: `Payment Receipt: ${payment.receiptNumber || 'FeeHub'} - ${instName}`,
             html: `
