@@ -17,5 +17,12 @@ const studentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 studentSchema.index({ institutionId: 1, studentIdNumber: 1 }, { unique: true });
+studentSchema.index(
+    { institutionId: 1, email: 1 }, 
+    { 
+        unique: true, 
+        partialFilterExpression: { email: { $type: "string", $gt: "" } } 
+    }
+);
 
 module.exports = mongoose.models.Student || mongoose.model('Student', studentSchema);

@@ -30,33 +30,41 @@ async function sendReceiptEmail(payment, student, instName) {
             to: student.email,
             subject: `Payment Receipt: ${payment.receiptNumber || 'FeeHub'} - ${instName}`,
             html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
-                <div style="background-color: #2c3e50; color: white; padding: 20px; text-align: center;">
-                    <h1 style="margin: 0; font-size: 24px;">${instName.toUpperCase()}</h1>
-                    <p style="margin: 5px 0 0 0; color: #cbd5e1;">Official Payment Receipt</p>
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; color: #334155; background-color: #fff;">
+                <div style="background-color: #1e293b; color: white; padding: 30px 20px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 20px; letter-spacing: 1px;">${instName.toUpperCase()}</h1>
+                    <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 14px;">Fee Payment Confirmation</p>
                 </div>
-                <div style="padding: 20px;">
-                    <p>Dear <strong>${student.name}</strong>,</p>
-                    <p>We have successfully received your fee payment. Below are the details of your transaction:</p>
+                <div style="padding: 30px;">
+                    <p style="font-size: 15px;">Dear <strong>${student.name}</strong>,</p>
+                    <p style="font-size: 14px; line-height: 1.6;">Your payment has been successfully recorded at <strong>${instName}</strong>. Please find your transaction summary below:</p>
                     
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
-                        <tr><td style="padding: 5px 0; color: #64748b;">Receipt No:</td><td style="padding: 5px 0; text-align: right; font-weight: bold;">${payment.receiptNumber || 'N/A'}</td></tr>
-                        <tr><td style="padding: 5px 0; color: #64748b;">Date:</td><td style="padding: 5px 0; text-align: right; font-weight: bold;">${new Date(payment.paymentDate || payment.createdAt).toLocaleDateString('en-IN')}</td></tr>
-                        <tr><td style="padding: 5px 0; color: #64748b;">Mode:</td><td style="padding: 5px 0; text-align: right; font-weight: bold;">${payment.paymentMethod}</td></tr>
-                    </table>
-
-                    <h3 style="margin-top: 30px; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px;">Fee Breakdown</h3>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                        ${componentsHtml}
-                        <tr><td style="padding: 12px 8px; font-weight: bold; font-size: 16px;">Total Paid</td><td style="padding: 12px 8px; text-align: right; font-weight: bold; font-size: 16px; color: #10b981;">₹${payment.amount.toLocaleString('en-IN')}</td></tr>
-                    </table>
-
-                    <div style="margin-top: 25px; padding: 15px; background-color: #f8fafc; border-left: 4px solid ${dueColor}; border-radius: 4px;">
-                        <p style="margin: 0; font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold;">Account Summary</p>
-                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold; color: ${dueColor};">Current Due Balance: ${dueText}</p>
+                    <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 20px; margin: 25px 0;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <tr><td style="padding: 5px 0; color: #64748b;">Receipt No:</td><td style="padding: 5px 0; text-align: right; font-weight: bold;">${payment.receiptNumber || 'N/A'}</td></tr>
+                            <tr><td style="padding: 5px 0; color: #64748b;">Date:</td><td style="padding: 5px 0; text-align: right; font-weight: bold;">${new Date(payment.paymentDate || payment.createdAt).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'})}</td></tr>
+                            <tr><td style="padding: 5px 0; color: #64748b;">Method:</td><td style="padding: 5px 0; text-align: right; font-weight: bold;">${payment.paymentMethod}</td></tr>
+                        </table>
                     </div>
 
-                    <p style="margin-top: 30px; font-size: 12px; color: #64748b; text-align: center;">This is a computer-generated receipt.</p>
+                    <h3 style="font-size: 14px; text-transform: uppercase; color: #94a3b8; margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px;">Breakdown</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        ${componentsHtml}
+                        <tr><td style="padding: 15px 10px; font-weight: bold; font-size: 18px; color: #1e293b;">Total Received</td><td style="padding: 15px 10px; text-align: right; font-weight: bold; font-size: 18px; color: #10b981;">₹${payment.amount.toLocaleString('en-IN')}</td></tr>
+                    </table>
+
+                    <div style="margin-top: 25px; padding: 15px; background-color: #fffaf0; border-left: 4px solid ${dueColor}; border-radius: 4px;">
+                        <p style="margin: 0; font-size: 11px; color: #92400e; text-transform: uppercase; font-weight: bold;">Balance Notification</p>
+                        <p style="margin: 5px 0 0 0; font-size: 15px; font-weight: bold; color: ${dueColor};">Current Due Balance: ${dueText}</p>
+                    </div>
+
+                    <p style="margin-top: 40px; font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                        This is an official transactional email from <strong>${instName}</strong> via FeeHub Cloud.<br>
+                        If you have questions about this payment, please contact the institution directly.
+                    </p>
+                </div>
+                <div style="background-color: #f1f5f9; padding: 15px; text-align: center; font-size: 10px; color: #94a3b8;">
+                    FeeHub Workspace &bull; Secure Payment Processing &bull; ${new Date().getFullYear()}
                 </div>
             </div>`
         };

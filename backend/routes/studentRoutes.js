@@ -18,6 +18,20 @@ router.post('/', protect, async (req, res) => {
     try {
         const studentData = { ...req.body, institutionId: req.user.institutionId };
         
+        // Prevent duplicate emails within the same institution
+        if (studentData.email) {
+            const existingEmail = await Student.findOne({ 
+                institutionId: req.user.institutionId, 
+                email: studentData.email 
+            });
+            if (existingEmail) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `A student is already registered with the email: ${studentData.email}` 
+                });
+            }
+        }
+
         // Custom ID Logic: First 3 of Name + (Last 4 of Phone OR Last 4 of Email)
         if (!studentData.studentIdNumber) {
             const namePart = (studentData.name || 'STU').replace(/\s/g, '').substring(0, 3).toUpperCase();
