@@ -19,8 +19,10 @@ const superAdminOnly = (req, res, next) => {
 // @desc    Get global platform stats and all institutions
 router.get('/dashboard', protect, superAdminOnly, async (req, res) => {
     try {
-        // 1. Fetch all institutions (excluding HQ itself for clean metrics)
-        const institutionsRaw = await Institution.find().lean();
+        // 1. Fetch all institutions (excluding the SuperAdmin's own HQ record if linked)
+        const hqId = req.user.institutionId;
+        const query = hqId ? { _id: { $ne: hqId } } : {};
+        const institutionsRaw = await Institution.find(query).lean();
 
         // 2. Fetch platform wide metrics
         const totalUsers = await User.countDocuments({ role: { $ne: 'SuperAdmin' } });
@@ -41,7 +43,7 @@ router.get('/dashboard', protect, superAdminOnly, async (req, res) => {
             success: true,
             data: {
                 institutions,
-                totalInstitutions: institutions.length - 1, // Subtract the HQ account
+                totalInstitutions: institutions.length, // Now accurately reflects the count in the table
                 totalPlatformUsers: totalUsers + totalStudents,
                 totalPlatformRevenue
             }
